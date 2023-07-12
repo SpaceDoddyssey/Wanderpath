@@ -31,10 +31,30 @@ class MainScene extends Phaser.Scene {
         keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
+        const generateButton = this.add.text(10, 70, 'Generate new puzzle', { fill: '#0f0' });
+        generateButton.setInteractive();
+        generateButton.on('pointerdown', () => { 
+            this.resetGrid()
+            this.populateGrid(gridWidth, gridHeight);
+            this.generatePuzzle(gridWidth, gridHeight);
+            this.drawGrid();
+        });
+
+        
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
 
         this.drawGrid();
+    }
+
+    resetGrid(){
+        this.targetPath = null
+        this.nodes.forEach(node => {
+            node.timesCrossed = 0
+        })
+        this.edges.forEach(edge => {
+            edge.timesCrossed = 0
+        })
     }
 
     populateGrid(width, height){
@@ -52,20 +72,21 @@ class MainScene extends Phaser.Scene {
                 if(x != width - 1){
                     let from = this.nodes[ (width * y) + x ]
                     let to   = this.nodes[ (width * y) + x + 1]
-                    this.edges.push(new Edge(from, to))
+                    this.edges.push(from.connectEdge(to, Dirs.Right))
                 }
                 //Connect to the node below
                 if(y != height - 1){
                     let from = this.nodes[ (width * y) + x ]
                     let to   = this.nodes[ (width * (y + 1)) + x ]
-                    this.edges.push(new Edge(from, to))
+                    this.edges.push(from.connectEdge(to, Dirs.Down))
                 }
             }
         }
     }
 
     generatePuzzle(width, height){
-
+        this.targetPath = new Path()
+        this.targetPath.generate(this.nodes, 5)
     }
 
     drawGrid(){
@@ -80,10 +101,14 @@ class MainScene extends Phaser.Scene {
 
     drawNode(node){}
     drawEdge(edge){
-        let fromLoc = edge.from.Loc();
-        let toLoc   = edge.to.Loc();
+        let fromLoc = edge.from.ScreenLoc();
+        let toLoc   = edge.to.ScreenLoc();
 
-        this.graphics.lineStyle(10, 0xFFFFFF, 1.0);
+        if(edge.timesCrossed > 0){
+            this.graphics.lineStyle(10, 0xFF0000, 1.0);
+        } else {
+            this.graphics.lineStyle(10, 0xFFFFFF, 1.0);
+        }
         this.graphics.beginPath();
         this.graphics.moveTo(fromLoc[0], fromLoc[1]);
         this.graphics.lineTo(toLoc[0], toLoc[1]);
