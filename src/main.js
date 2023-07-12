@@ -34,4 +34,6 @@ const Dirs = {
 
 const InverseDirs = [Dirs.Down, Dirs.Up, Dirs.Right, Dirs.Left, Dirs.Endpoint]
 
+const dirNames = ["north", "south", "west", "east"]
+
 let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR;

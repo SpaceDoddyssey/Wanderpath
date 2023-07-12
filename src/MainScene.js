@@ -35,12 +35,10 @@ class MainScene extends Phaser.Scene {
         generateButton.setInteractive();
         generateButton.on('pointerdown', () => { 
             this.resetGrid()
-            this.populateGrid(gridWidth, gridHeight);
             this.generatePuzzle(gridWidth, gridHeight);
             this.drawGrid();
         });
 
-        
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
 
@@ -51,6 +49,7 @@ class MainScene extends Phaser.Scene {
         this.targetPath = null
         this.nodes.forEach(node => {
             node.timesCrossed = 0
+            node.endPoint = false
         })
         this.edges.forEach(edge => {
             edge.timesCrossed = 0
@@ -86,11 +85,11 @@ class MainScene extends Phaser.Scene {
 
     generatePuzzle(width, height){
         this.targetPath = new Path()
-        this.targetPath.generate(this.nodes, 5)
+        this.targetPath.generate(this.nodes, 8)
     }
 
     drawGrid(){
-        //this.edges.forEach(node => console.log(node))
+        this.graphics.clear();
         this.nodes.forEach(node => {
             this.drawNode(node);
         });
@@ -99,7 +98,12 @@ class MainScene extends Phaser.Scene {
         });
     }
 
-    drawNode(node){}
+    drawNode(node){
+        if(node.endPoint){
+            let loc = node.ScreenLoc();
+            this.graphics.fillStyle(0xFFFFFF, 1).fillCircle(loc[0], loc[1], 20)  
+        }
+    }
     drawEdge(edge){
         let fromLoc = edge.from.ScreenLoc();
         let toLoc   = edge.to.ScreenLoc();

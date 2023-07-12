@@ -1,7 +1,7 @@
 class GraphElement {
     constructor() {
         this.timesCrossed = 0
-        this.maxCrosses = 1
+        this.maxCrosses = 2
     }
 
     // static dirBetween(from, to){
