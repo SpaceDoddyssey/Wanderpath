@@ -16,6 +16,26 @@ let config = {
     scene:[ MainScene ]
 }
 
+// text configuration
+let textConfig = {
+    fontFamily: 'Georgia',
+    fontSize: '28px',
+    color: '#843605',
+    align: 'right',
+    padding: {
+        top: 5,
+        bottom: 5,
+    },
+    fixedWidth: 0
+}
+
+let restraintConfig = {
+    fontFamily: 'Georgia',
+    fontSize: '28px',
+    color: '#0000F5',
+    align: 'center'
+}
+
 function newDimensions(newGridWidth, newGridHeight) {
     let w = (newGridWidth * sizePerUnit) + borderPadding * 2;
     let h = (newGridHeight * sizePerUnit) + borderPadding * 2 + UIspacerheight;

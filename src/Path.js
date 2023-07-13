@@ -9,7 +9,7 @@ class Path {
 
     generate(nodes, length){
         let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
-        console.log("Selected starting node ", curNode.x, ", ", curNode.y)
+        //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
 
         curNode.endPoint = true;
         this.maxLength = length;
@@ -19,10 +19,7 @@ class Path {
 
         this.recursivePath(curNode);
 
-        
-        console.log("Path finished: ", this.edgeList)
-
-        //Wipe the timesCrossed of each 
+        //console.log("Path finished: ", this.edgeList)
     }
     
     //Recursively moves in a random direction, pushing edges to the path, backing up if it can't move
@@ -36,13 +33,12 @@ class Path {
         for(let i = 0; i < 4; i++) {
             let curDir = validDirs[i];
 
-            console.log("Looking at edge ", curDir)
+            //console.log("Looking at edge ", curDir)
 
             //If we've already found an edge, or this is the direction we came from, skip
             if(selectedEdge) continue
-            console.log("Inverse direction = ", InverseDirs[this.dirsTravelled[this.dirsTravelled.length-1]]);
-            if(curDir == InverseDirs[this.dirsTravelled[this.dirsTravelled.length-1]]) continue
-
+            let inverseDir = InverseDirs[this.dirsTravelled[this.dirsTravelled.length-1]];
+            if(curDir == inverseDir) continue
 
             //If there's no edge in that direction, skip
             let edge = node.edges[curDir]
@@ -60,7 +56,7 @@ class Path {
             otherNode.cross()
             this.dirsTravelled.push(curDir);
             this.edgeList.push(edge)
-            console.log("Travelling " + dirNames[curDir]);
+            //console.log("Travelling " + dirNames[curDir]);
 
             //If we're at the desired distance, we're all done
             if(this.edgeList.length == this.maxLength){

@@ -2,6 +2,8 @@ class GraphElement {
     constructor() {
         this.timesCrossed = 0
         this.maxCrosses = 2
+
+        this.numberRestraint = -1;
     }
 
     // static dirBetween(from, to){

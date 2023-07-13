@@ -8,7 +8,19 @@ class Node extends GraphElement {
         this.x = x, this.y = y;
                             
         this.edges = [null, null, null, null];
+
+        this.numberRestraint = -1;
     }
+
+
+    addRandomRestraint(){
+        if(this.numberRestraint == -1){
+            this.numberRestraint = this.timesCrossed;
+            return true
+        }
+        return false
+    }
+
 
     GridLoc(){
         return [this.x, this.y]

@@ -7,19 +7,6 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
-        // text configuration
-        let textConfig = {
-            fontFamily: 'Georgia',
-            fontSize: '28px',
-            color: '#843605',
-            align: 'right',
-            padding: {
-                top: 5,
-                bottom: 5,
-            },
-            fixedWidth: 0
-        }
-
         this.graphics = this.add.graphics();
 
         // show game title text
@@ -39,23 +26,40 @@ class MainScene extends Phaser.Scene {
             this.drawGrid();
         });
 
+        this.restraintTexts = []
+
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
 
         this.drawGrid();
     }
 
+    placeRestraint(){   
+        let allElements = this.nodes.concat(this.edges)
+        Phaser.Utils.Array.Shuffle(allElements)
+        for(let i = 0; i < allElements.length; i++){
+            let element = allElements[i]
+            let added = element.addRandomRestraint();
+            if(added) return
+        }
+    }
+
     resetGrid(){
         this.targetPath = null
         this.nodes.forEach(node => {
             node.timesCrossed = 0
+            node.numberRestraint = -1
             node.endPoint = false
         })
         this.edges.forEach(edge => {
             edge.timesCrossed = 0
+            edge.numberRestraint = -1
+        })
+        this.restraintTexts.forEach(text => {
+            console.log("text")
+            text.destroy()
         })
     }
-
     populateGrid(width, height){
         this.nodes = []
         this.edges = []
@@ -82,12 +86,14 @@ class MainScene extends Phaser.Scene {
             }
         }
     }
-
     generatePuzzle(width, height){
         this.targetPath = new Path()
         this.targetPath.generate(this.nodes, 8)
-    }
 
+        this.placeRestraint();
+        this.placeRestraint();
+        this.placeRestraint();
+    }
     drawGrid(){
         this.graphics.clear();
         this.nodes.forEach(node => {
@@ -96,6 +102,25 @@ class MainScene extends Phaser.Scene {
         this.edges.forEach(edge => {
             this.drawEdge(edge);    
         });
+        this.drawRestraints();
+    }
+
+    drawRestraints(){
+        this.nodes.forEach(node => {
+            if(node.numberRestraint != -1){
+                //console.log("node")
+                this.restraintTexts.push(this.add.text((node.ScreenLoc())[0], 
+                    (node.ScreenLoc())[1], 
+                    node.numberRestraint, restraintConfig).setOrigin(0.5));
+            }
+        })
+        this.edges.forEach(edge => {
+            if(edge.numberRestraint != -1){
+                this.restraintTexts.push(this.add.text((edge.ScreenLoc())[0], 
+                            (edge.ScreenLoc())[1], 
+                            edge.numberRestraint, restraintConfig).setOrigin(0.5));
+            }
+        })
     }
 
     drawNode(node){
