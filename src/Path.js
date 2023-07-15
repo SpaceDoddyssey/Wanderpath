@@ -7,12 +7,12 @@ class Path {
         this.allDirs = [Dirs.Up, Dirs.Down, Dirs.Left, Dirs.Right]
     }
 
-    generate(nodes, length){
+    generate(nodes){
         let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
         //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
 
         curNode.endPoint = true;
-        this.maxLength = length;
+        this.maxLength = maxLength;
 
         curNode.cross()
         this.startNode = curNode;

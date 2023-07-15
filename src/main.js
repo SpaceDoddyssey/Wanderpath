@@ -2,8 +2,10 @@ let UIspacerheight = 64;
 let borderPadding = 64;
 let sizePerUnit = 64;
 
-let gridWidth = 4;
-let gridHeight = 4;
+let gridWidth  = document.getElementById('widthField').value
+let gridHeight = document.getElementById('heightField').value
+let maxLength  = document.getElementById('lengthField').value
+let maxCrosses = document.getElementById('maxCrossingField').value
 
 let defaultDimensions = newDimensions(gridWidth, gridHeight)
 
@@ -32,7 +34,7 @@ let textConfig = {
 let restraintConfig = {
     fontFamily: 'Georgia',
     fontSize: '28px',
-    color: '#0000F5',
+    color: '#1722E8',
     align: 'center'
 }
 
@@ -57,3 +59,19 @@ const InverseDirs = [Dirs.Down, Dirs.Up, Dirs.Right, Dirs.Left, Dirs.Endpoint]
 const dirNames = ["north", "south", "west", "east"]
 
 let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR;
+
+//Used to enforce minmax on the html fifieldds 
+function enforceMinMax(field){
+    //First enforce minmax
+    if(field.value != ""){
+        console.log("Minmax")
+        if(parseInt(field.value) < parseInt(field.min)){
+        field.value = field.min;
+        }
+        if(parseInt(field.value) > parseInt(field.max)){
+        field.value = field.max;
+        }
+    } else {
+        field.value = field.min;
+    }
+}

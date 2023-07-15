@@ -8,17 +8,15 @@ class Node extends GraphElement {
         this.x = x, this.y = y;
                             
         this.edges = [null, null, null, null];
-
-        this.numberRestraint = -1;
     }
 
 
-    addRandomRestraint(){
+    addRestraints(){
+        //This will be more complicated once other types of restraints are added
         if(this.numberRestraint == -1){
             this.numberRestraint = this.timesCrossed;
-            return true
+            this.totalRestraints++;
         }
-        return false
     }
 
 

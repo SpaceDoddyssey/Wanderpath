@@ -26,6 +26,8 @@ class MainScene extends Phaser.Scene {
             this.drawGrid();
         });
 
+        document.getElementById('regenerateGridButton').onclick = this.regenerateScene.bind(this);
+        
         this.restraintTexts = []
 
         this.populateGrid(gridWidth, gridHeight);
@@ -34,14 +36,20 @@ class MainScene extends Phaser.Scene {
         this.drawGrid();
     }
 
-    placeRestraint(){   
-        let allElements = this.nodes.concat(this.edges)
-        Phaser.Utils.Array.Shuffle(allElements)
-        for(let i = 0; i < allElements.length; i++){
-            let element = allElements[i]
-            let added = element.addRandomRestraint();
-            if(added) return
-        }
+    regenerateScene(){
+        gridWidth  = document.getElementById('widthField').value
+        gridHeight = document.getElementById('heightField').value
+        maxLength  = document.getElementById('lengthField').value
+        maxCrosses = document.getElementById('maxCrossingField').value
+        
+        let newDim = newDimensions(gridWidth, gridHeight);
+        game.scale.resize(newDim[0], newDim[1]);
+        
+        this.resetGrid();
+        this.populateGrid(gridWidth, gridHeight);
+        this.generatePuzzle(gridWidth, gridHeight);
+
+        this.drawGrid();
     }
 
     resetGrid(){
@@ -90,25 +98,30 @@ class MainScene extends Phaser.Scene {
         this.targetPath = new Path()
         this.targetPath.generate(this.nodes, 8)
 
-        this.placeRestraint();
-        this.placeRestraint();
-        this.placeRestraint();
+        this.placeRestraints();
     }
+    
     drawGrid(){
         this.graphics.clear();
-        this.nodes.forEach(node => {
-            this.drawNode(node);
-        });
         this.edges.forEach(edge => {
             this.drawEdge(edge);    
+        });
+        this.nodes.forEach(node => {
+            this.drawNode(node);
         });
         this.drawRestraints();
     }
 
+    placeRestraints(){   
+        let allElements = this.nodes.concat(this.edges)
+        Phaser.Utils.Array.Shuffle(allElements)
+        allElements.forEach(element => {
+            element.addRestraints();
+        })
+    }
     drawRestraints(){
         this.nodes.forEach(node => {
             if(node.numberRestraint != -1){
-                //console.log("node")
                 this.restraintTexts.push(this.add.text((node.ScreenLoc())[0], 
                     (node.ScreenLoc())[1], 
                     node.numberRestraint, restraintConfig).setOrigin(0.5));
@@ -124,9 +137,19 @@ class MainScene extends Phaser.Scene {
     }
 
     drawNode(node){
+        let color
+        if(node.timesCrossed > 0){
+            color = 0xFF0000
+        } else {
+            color = 0xFFFFFF
+        }
+
         if(node.endPoint){
             let loc = node.ScreenLoc();
-            this.graphics.fillStyle(0xFFFFFF, 1).fillCircle(loc[0], loc[1], 20)  
+            this.graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], 20)  
+        } else {
+            let loc = node.ScreenLoc();
+            this.graphics.fillStyle(color, 1).fillRect(loc[0] - 7, loc[1] - 7, 14, 14)
         }
     }
     drawEdge(edge){
@@ -134,9 +157,9 @@ class MainScene extends Phaser.Scene {
         let toLoc   = edge.to.ScreenLoc();
 
         if(edge.timesCrossed > 0){
-            this.graphics.lineStyle(10, 0xFF0000, 1.0);
+            this.graphics.lineStyle(14, 0xFF0000, 1.0);
         } else {
-            this.graphics.lineStyle(10, 0xFFFFFF, 1.0);
+            this.graphics.lineStyle(14, 0xFFFFFF, 1.0);
         }
         this.graphics.beginPath();
         this.graphics.moveTo(fromLoc[0], fromLoc[1]);

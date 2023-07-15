@@ -14,12 +14,12 @@ class Edge extends GraphElement {
         return [x, y]
     }
 
-    addRandomRestraint(){
+    addRestraints(){
+        //This will be more complicated once other types of restraints are added
         if(this.numberRestraint == -1){
             this.numberRestraint = this.timesCrossed;
-            return true
+            this.totalRestraints++;
         }
-        return false
     }
 
     otherNode(node){
