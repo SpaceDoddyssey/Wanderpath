@@ -12,13 +12,18 @@ class Path {
         //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
 
         curNode.endPoint = true;
+        endNode1 = curNode;
         this.maxLength = maxLength;
 
         curNode.cross()
         this.startNode = curNode;
 
-        this.recursivePath(curNode);
+        let validPath = this.recursivePath(curNode);
 
+        if(!validPath){
+            console.log("No valid path found!")
+            return false
+        }
         //console.log("Path finished: ", this.edgeList)
     }
     
@@ -63,6 +68,7 @@ class Path {
                 let finalNode = otherNode
                 this.dirsTravelled.push(curDir);
                 finalNode.endPoint = true
+                endNode2 = finalNode
                 return true
             } 
     
@@ -82,6 +88,7 @@ class Path {
 
         //If we're at this point either we've finished or we've hit a dead end and need to backtrack
         if(selectedEdge == null) {
+            //console.log("Dead end")
             return false
         } else {
             return true

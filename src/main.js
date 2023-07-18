@@ -9,6 +9,8 @@ let maxCrosses = document.getElementById('maxCrossingField').value
 
 let defaultDimensions = newDimensions(gridWidth, gridHeight)
 
+let endNode1, endNode2
+
 let config = {
     type: Phaser.CANVAS,
     mode: Phaser.Scale.RESIZE,

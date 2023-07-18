@@ -1,15 +1,15 @@
 //This class represents the intersections between edges
 class Node extends GraphElement {
-    constructor(x, y) {
+    constructor(x, y, id) {
         super();
 
         this.endPoint = false;
         
+        this.id = id;
         this.x = x, this.y = y;
                             
         this.edges = [null, null, null, null];
     }
-
 
     addRestraints(){
         //This will be more complicated once other types of restraints are added
@@ -18,7 +18,6 @@ class Node extends GraphElement {
             this.totalRestraints++;
         }
     }
-
 
     GridLoc(){
         return [this.x, this.y]

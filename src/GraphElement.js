@@ -1,10 +1,15 @@
 class GraphElement {
     constructor() {
         this.timesCrossed = 0
-        this.maxCrosses = 4
+        this.maxCrosses = maxCrosses
 
         this.numberRestraint = -1;
         this.totalRestraints = 0;
+    }
+
+    restraintsSatisfied(){
+        //this will get more complex when I add other restraint types
+        return ((this.numberRestraint == -1) || (this.timesCrossed == this.numberRestraint))
     }
 
     uncross(){
@@ -23,8 +28,13 @@ class GraphElement {
     }
 
     canCross(){
+        let crossMax = this.maxCrosses
+        if (this.numberRestraint != -1){
+            crossMax = this.numberRestraint
+        }
+
         //cross and cancross are separate because they will probably get more complicated later
-        if(this.timesCrossed < this.maxCrosses){
+        if(this.timesCrossed < crossMax){
             return true
         } else {
             return false

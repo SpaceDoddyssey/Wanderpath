@@ -10,7 +10,7 @@ class MainScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
 
         // show game title text
-        this.add.text(10, 0, 'Spaghetti Loops', textConfig);
+        this.add.text(10, 0, 'Spaghetti Plate', textConfig);
 
         // define keys
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -22,6 +22,8 @@ class MainScene extends Phaser.Scene {
         generateButton.setInteractive();
         generateButton.on('pointerdown', () => { 
             this.resetGrid()
+            let allElements = this.nodes.concat(this.edges)
+            allElements.forEach(el => { el.maxCrosses = maxCrosses })
             this.generatePuzzle(gridWidth, gridHeight);
             this.drawGrid();
         });
@@ -34,6 +36,141 @@ class MainScene extends Phaser.Scene {
         this.generatePuzzle(gridWidth, gridHeight);
 
         this.drawGrid();
+    }
+
+    generatePuzzle(width, height){
+        this.targetPath = new Path()
+        this.targetPath.generate(this.nodes, 8)
+
+        this.placeRestraints();
+
+        this.nodes.forEach(node => { node.timesCrossed = 0 })
+        this.edges.forEach(edge => { edge.timesCrossed = 0 })
+
+        let redundantRestraintsLeft = true;
+        let allElements = this.nodes.concat(this.edges);
+        Phaser.Utils.Array.Shuffle(allElements);
+
+        //let removed = this.tryRemoveRestraint(this.nodes[0]);   
+
+        while(redundantRestraintsLeft){
+            redundantRestraintsLeft = false;
+            allElements.forEach(element => {
+                let removed = this.tryRemoveRestraint(element);    
+                if(removed){
+                    redundantRestraintsLeft = true
+                }
+            })
+        }
+    }
+
+    tryRemoveRestraint(element){
+        if(element.numberRestraint == -1){
+            //There's no restraint here to remove
+            return false;
+        } else {
+            //Save and remove the restraint on the element
+            let restraint = element.numberRestraint;
+            element.numberRestraint = -1;
+
+            if(element.x){
+                console.log("Attempting to remove restraint from node at ", element.x, ", ", element.y)
+            } else {
+                console.log("Attempting to remove restraint from edge")
+            }
+
+            //If there is still only one solution, the restraint is safe to remove
+            if(this.checkSolutions()){
+                console.log("Restraint successfully removed")
+                return true;
+            } else {
+                console.log("Restraint could not be removed")
+                element.numberRestraint = restraint;
+                return false;
+            }
+        }
+    }
+
+    checkSolutions(){
+        endNode1.cross()
+        let num_solutions = this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint);
+        if(num_solutions > 1) {
+            endNode1.uncross()
+            return false
+        }
+        endNode1.uncross()
+
+        endNode2.cross()
+        num_solutions = this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint);
+        if(num_solutions > 1) {
+            endNode2.uncross()
+            return false
+        }
+        endNode2.uncross()
+
+        return true;
+    }
+
+    recursiveSolutionFinder(node, goalNode, lastDir){
+        console.log("Checking node " + node.id)
+        if(node == goalNode && lastDir != Dirs.Endpoint) { 
+            if(this.allRestraintsSatisfied()) {
+                console.log("Found a solution")
+                return 1 
+            }
+            else {
+                console.log("End goal reached, restraints not satisfied")
+                return 0
+            }
+        }
+        let solutions = 0 
+
+        for(let i = 0; i < 4; i++) {
+            let curDir = i;
+
+            console.log("Looking at edge ", curDir)
+
+            //If this is the direction we came from, skip
+            let inverseDir = InverseDirs[lastDir];
+            if(curDir == inverseDir) { console.log("That's the way we came"); continue }
+
+            //If there's no edge in that direction, skip
+            let edge = node.edges[curDir]
+            if (edge == null) { console.log("No edge"); continue }  
+
+            //If the edge in that direction, or the node it leads to, can't be crossed, skip
+            let otherNode = edge.otherNode(node);
+            let edgeCrossable = edge.canCross();
+            let nodeCrossable = otherNode.canCross();
+            if(!edgeCrossable || !nodeCrossable) {
+                console.log("Can't be crossed"); 
+                continue
+            }
+
+            //As far as we can tell from here this edge is valid, so let's cross it
+            edge.cross();
+            otherNode.cross()
+
+            solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir)
+
+            edge.uncross();
+            otherNode.uncross()
+
+            if(solutions > 1) return solutions
+        }
+
+        if(solutions > 0){
+            console.log("Branch with ", solutions, " solutions")
+        }
+        return solutions
+    }
+
+    allRestraintsSatisfied(){
+        let allElements = this.nodes.concat(this.edges)
+        allElements.forEach(element => {
+            if(element.restraintsSatisfied() == false) { return false }
+        })
+        return true
     }
 
     regenerateScene(){
@@ -64,16 +201,18 @@ class MainScene extends Phaser.Scene {
             edge.numberRestraint = -1
         })
         this.restraintTexts.forEach(text => {
-            console.log("text")
+            //console.log("text")
             text.destroy()
         })
+        this.restraintTexts = [];
     }
     populateGrid(width, height){
         this.nodes = []
         this.edges = []
+        let counter = 0
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                let n = new Node(x, y);
+                let n = new Node(x, y, counter++);
                 this.nodes.push(n)   
             }
         }
@@ -93,12 +232,6 @@ class MainScene extends Phaser.Scene {
                 }
             }
         }
-    }
-    generatePuzzle(width, height){
-        this.targetPath = new Path()
-        this.targetPath.generate(this.nodes, 8)
-
-        this.placeRestraints();
     }
     
     drawGrid(){
