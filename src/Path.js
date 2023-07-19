@@ -8,23 +8,31 @@ class Path {
     }
 
     generate(nodes){
-        let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
-        //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
+        let invalid = true
+        while(invalid){
+            invalid = false
+            let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
+            //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
 
-        curNode.endPoint = true;
-        endNode1 = curNode;
-        this.maxLength = maxLength;
+            curNode.endPoint = true;
+            endNode1 = curNode;
+            this.maxLength = maxLength;
 
-        curNode.cross()
-        this.startNode = curNode;
+            curNode.cross()
+            this.startNode = curNode;
 
-        let validPath = this.recursivePath(curNode);
+            let validPath = this.recursivePath(curNode);
 
-        if(!validPath){
-            console.log("No valid path found!")
-            return false
+            if(!validPath){
+                console.log("No valid path found!")
+                this.startNode = null
+                curNode.endPoint = false
+                curNode.uncross()
+                invalid = true
+            }
         }
-        //console.log("Path finished: ", this.edgeList)
+        return true;
+            //console.log("Path finished: ", this.edgeList)
     }
     
     //Recursively moves in a random direction, pushing edges to the path, backing up if it can't move

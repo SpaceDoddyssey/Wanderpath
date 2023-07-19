@@ -106,6 +106,8 @@ class MainScene extends Phaser.Scene {
 
     checkSolutions(){
          // Check for solutions from the first of the two end nodes
+
+        let totalSolutions = 0
         endNode1.cross()
         let num_solutions = this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
         console.log("Found " + num_solutions + " solutions from start node 1")
@@ -114,6 +116,7 @@ class MainScene extends Phaser.Scene {
             return false
         }
         endNode1.uncross()
+        totalSolutions += num_solutions;
 
         // Check for solutions from the second of the two end nodes
         endNode2.cross()
@@ -124,6 +127,9 @@ class MainScene extends Phaser.Scene {
             return false
         }
         endNode2.uncross()
+        totalSolutions += num_solutions;
+
+        if (totalSolutions < 1) return false
 
         return true;
     }
