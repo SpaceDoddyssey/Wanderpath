@@ -1,11 +1,10 @@
 //This class represents the intersections between edges
 class Node extends GraphElement {
     constructor(x, y, id) {
-        super();
+        super(id);
 
         this.endPoint = false;
         
-        this.id = id;
         this.x = x, this.y = y;
                             
         this.edges = [null, null, null, null];
@@ -29,8 +28,8 @@ class Node extends GraphElement {
         return [x, y]
     }
 
-    connectEdge(toNode, dir){
-        let edge = new Edge(this, toNode)
+    connectEdge(toNode, dir, id){
+        let edge = new Edge(this, toNode, id)
         
         this.edges[dir] = edge
         toNode.edges[InverseDirs[dir]] = edge

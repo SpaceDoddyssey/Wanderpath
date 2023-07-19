@@ -1,6 +1,6 @@
 class Edge extends GraphElement {
-    constructor(from, to) {
-        super();
+    constructor(from, to, id) {
+        super(id);
         
         this.from = from;
         this.to = to; //These are Nodes   

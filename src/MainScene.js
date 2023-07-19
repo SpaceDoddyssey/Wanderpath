@@ -12,6 +12,9 @@ class MainScene extends Phaser.Scene {
         // show game title text
         this.add.text(10, 0, 'Spaghetti Plate', textConfig);
 
+        var rnd = Phaser.Math.RND;
+        rnd.init("Blah")
+
         // define keys
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
@@ -39,8 +42,10 @@ class MainScene extends Phaser.Scene {
     }
 
     generatePuzzle(width, height){
+        console.clear()
+
         this.targetPath = new Path()
-        this.targetPath.generate(this.nodes, 8)
+        this.targetPath.generate(this.nodes, maxLength)
 
         this.placeRestraints();
 
@@ -53,6 +58,10 @@ class MainScene extends Phaser.Scene {
 
         //let removed = this.tryRemoveRestraint(this.nodes[0]);   
 
+        this.drawGrid()
+
+        this.printGrid()
+
         while(redundantRestraintsLeft){
             redundantRestraintsLeft = false;
             allElements.forEach(element => {
@@ -60,8 +69,12 @@ class MainScene extends Phaser.Scene {
                 if(removed){
                     redundantRestraintsLeft = true
                 }
+                this.drawGrid();
             })
         }
+
+        console.log("----------------- All Restraints removed.")
+        this.checkSolutions();
     }
 
     tryRemoveRestraint(element){
@@ -76,7 +89,7 @@ class MainScene extends Phaser.Scene {
             if(element.x){
                 console.log("Attempting to remove restraint from node at ", element.x, ", ", element.y)
             } else {
-                console.log("Attempting to remove restraint from edge")
+                console.log("Attempting to remove restraint from edge ", element.ID)
             }
 
             //If there is still only one solution, the restraint is safe to remove
@@ -92,16 +105,20 @@ class MainScene extends Phaser.Scene {
     }
 
     checkSolutions(){
+         // Check for solutions from the first of the two end nodes
         endNode1.cross()
-        let num_solutions = this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint);
+        let num_solutions = this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
+        console.log("Found " + num_solutions + " solutions from start node 1")
         if(num_solutions > 1) {
             endNode1.uncross()
             return false
         }
         endNode1.uncross()
 
+        // Check for solutions from the second of the two end nodes
         endNode2.cross()
-        num_solutions = this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint);
+        num_solutions = this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint, 0);
+        console.log("Found " + num_solutions + " solutions from start node 2")
         if(num_solutions > 1) {
             endNode2.uncross()
             return false
@@ -111,16 +128,14 @@ class MainScene extends Phaser.Scene {
         return true;
     }
 
-    recursiveSolutionFinder(node, goalNode, lastDir){
-        console.log("Checking node " + node.id)
+    recursiveSolutionFinder(node, goalNode, lastDir, length){
+        //console.log("Checking node " + node.ID)
         if(node == goalNode && lastDir != Dirs.Endpoint) { 
             if(this.allRestraintsSatisfied()) {
                 console.log("Found a solution")
                 return 1 
-            }
-            else {
-                console.log("End goal reached, restraints not satisfied")
-                return 0
+            } else {
+                //console.log("Touched the end - restraints not satisfied, continuing")
             }
         }
         let solutions = 0 
@@ -128,22 +143,28 @@ class MainScene extends Phaser.Scene {
         for(let i = 0; i < 4; i++) {
             let curDir = i;
 
-            console.log("Looking at edge ", curDir)
+            //console.log("Looking at edge ", curDir)
 
             //If this is the direction we came from, skip
             let inverseDir = InverseDirs[lastDir];
-            if(curDir == inverseDir) { console.log("That's the way we came"); continue }
+            if(curDir == inverseDir) { 
+                //console.log("That's the way we came"); 
+                continue 
+            }
 
             //If there's no edge in that direction, skip
             let edge = node.edges[curDir]
-            if (edge == null) { console.log("No edge"); continue }  
+            if (edge == null) { 
+                //console.log("No edge"); 
+                continue 
+            }  
 
             //If the edge in that direction, or the node it leads to, can't be crossed, skip
             let otherNode = edge.otherNode(node);
             let edgeCrossable = edge.canCross();
             let nodeCrossable = otherNode.canCross();
             if(!edgeCrossable || !nodeCrossable) {
-                console.log("Can't be crossed"); 
+                //console.log("Can't be crossed"); 
                 continue
             }
 
@@ -151,7 +172,9 @@ class MainScene extends Phaser.Scene {
             edge.cross();
             otherNode.cross()
 
-            solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir)
+            length++
+            solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
+            length--
 
             edge.uncross();
             otherNode.uncross()
@@ -160,16 +183,23 @@ class MainScene extends Phaser.Scene {
         }
 
         if(solutions > 0){
-            console.log("Branch with ", solutions, " solutions")
+            //console.log("Branch with ", solutions, " solutions")
         }
         return solutions
     }
 
     allRestraintsSatisfied(){
         let allElements = this.nodes.concat(this.edges)
-        allElements.forEach(element => {
-            if(element.restraintsSatisfied() == false) { return false }
-        })
+        let counter = 0
+        for(let i = 0; i < allElements.length; i++){
+            let element = allElements[i];
+            counter++
+            //console.log("Checking element " + counter);
+            if(element.restraintsSatisfied() == false) { 
+                //console.log("Not fulfilled, crossed ", element.timesCrossed, " times instead of ", element.numberRestraint)
+                return false 
+            }
+        }
         return true
     }
 
@@ -216,19 +246,20 @@ class MainScene extends Phaser.Scene {
                 this.nodes.push(n)   
             }
         }
+        counter = 0
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 //Connect to the node to the right
                 if(x != width - 1){
                     let from = this.nodes[ (width * y) + x ]
                     let to   = this.nodes[ (width * y) + x + 1]
-                    this.edges.push(from.connectEdge(to, Dirs.Right))
+                    this.edges.push(from.connectEdge(to, Dirs.Right, counter++))
                 }
                 //Connect to the node below
                 if(y != height - 1){
                     let from = this.nodes[ (width * y) + x ]
                     let to   = this.nodes[ (width * (y + 1)) + x ]
-                    this.edges.push(from.connectEdge(to, Dirs.Down))
+                    this.edges.push(from.connectEdge(to, Dirs.Down, counter++))
                 }
             }
         }
@@ -245,6 +276,16 @@ class MainScene extends Phaser.Scene {
         this.drawRestraints();
     }
 
+    printGrid(){
+        let nodeArray = []
+        let edgeArray = []
+        this.nodes.forEach(node => { nodeArray.push(node.numberRestraint) })
+        this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
+
+        console.log(nodeArray)
+        console.log(edgeArray)
+    }
+
     placeRestraints(){   
         let allElements = this.nodes.concat(this.edges)
         Phaser.Utils.Array.Shuffle(allElements)
@@ -253,6 +294,12 @@ class MainScene extends Phaser.Scene {
         })
     }
     drawRestraints(){
+        this.restraintTexts.forEach(text => {
+            //console.log("text")
+            text.destroy()
+        })
+        this.restraintTexts = [];
+
         this.nodes.forEach(node => {
             if(node.numberRestraint != -1){
                 this.restraintTexts.push(this.add.text((node.ScreenLoc())[0], 
