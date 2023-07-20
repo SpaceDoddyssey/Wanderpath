@@ -44,13 +44,21 @@ class MainScene extends Phaser.Scene {
     generatePuzzle(width, height){
         console.clear()
 
-        this.targetPath = new Path()
-        this.targetPath.generate(this.nodes, maxLength)
+        let valid = false;
+        while(!valid){
+            this.targetPath = new Path()
+            this.targetPath.generate(this.nodes, maxLength)
 
-        this.placeRestraints();
+            this.placeRestraints();
 
-        this.nodes.forEach(node => { node.timesCrossed = 0 })
-        this.edges.forEach(edge => { edge.timesCrossed = 0 })
+            this.nodes.forEach(node => { node.timesCrossed = 0 })
+            this.edges.forEach(edge => { edge.timesCrossed = 0 })
+
+            valid = this.checkSolutions()
+            if(!valid){
+                this.resetGrid()
+            }
+        }
 
         let redundantRestraintsLeft = true;
         let allElements = this.nodes.concat(this.edges);
@@ -106,9 +114,11 @@ class MainScene extends Phaser.Scene {
 
     checkSolutions(){
          // Check for solutions from the first of the two end nodes
+        this.solutionNodeList = []
 
         let totalSolutions = 0
         endNode1.cross()
+        this.solutionNodeList.push(endNode1.ID)
         let num_solutions = this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
         console.log("Found " + num_solutions + " solutions from start node 1")
         if(num_solutions > 1) {
@@ -120,7 +130,10 @@ class MainScene extends Phaser.Scene {
 
         // Check for solutions from the second of the two end nodes
         endNode2.cross()
+        this.solutionNodeList.pop()
+        this.solutionNodeList.push(endNode2.ID)
         num_solutions = this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint, 0);
+        this.solutionNodeList.pop()
         console.log("Found " + num_solutions + " solutions from start node 2")
         if(num_solutions > 1) {
             endNode2.uncross()
@@ -139,6 +152,7 @@ class MainScene extends Phaser.Scene {
         if(node == goalNode && lastDir != Dirs.Endpoint) { 
             if(this.allRestraintsSatisfied()) {
                 console.log("Found a solution")
+                console.log(this.solutionNodeList)
                 return 1 
             } else {
                 //console.log("Touched the end - restraints not satisfied, continuing")
@@ -177,11 +191,11 @@ class MainScene extends Phaser.Scene {
             //As far as we can tell from here this edge is valid, so let's cross it
             edge.cross();
             otherNode.cross()
-
+            this.solutionNodeList.push(otherNode.ID)
             length++
             solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
             length--
-
+            this.solutionNodeList.pop()
             edge.uncross();
             otherNode.uncross()
 
@@ -209,6 +223,10 @@ class MainScene extends Phaser.Scene {
         return true
     }
 
+//###############################################
+//############ MANIPULATING THE GRID ############    
+//###############################################
+
     regenerateScene(){
         gridWidth  = document.getElementById('widthField').value
         gridHeight = document.getElementById('heightField').value
@@ -224,7 +242,6 @@ class MainScene extends Phaser.Scene {
 
         this.drawGrid();
     }
-
     resetGrid(){
         this.targetPath = null
         this.nodes.forEach(node => {
@@ -270,7 +287,18 @@ class MainScene extends Phaser.Scene {
             }
         }
     }
-    
+    placeRestraints(){   
+        let allElements = this.nodes.concat(this.edges)
+        Phaser.Utils.Array.Shuffle(allElements)
+        allElements.forEach(element => {
+            element.addRestraints();
+        })
+    }
+
+//##########################################
+//############ DRAWING THE GRID ############    
+//##########################################
+
     drawGrid(){
         this.graphics.clear();
         this.edges.forEach(edge => {
@@ -280,24 +308,6 @@ class MainScene extends Phaser.Scene {
             this.drawNode(node);
         });
         this.drawRestraints();
-    }
-
-    printGrid(){
-        let nodeArray = []
-        let edgeArray = []
-        this.nodes.forEach(node => { nodeArray.push(node.numberRestraint) })
-        this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
-
-        console.log(nodeArray)
-        console.log(edgeArray)
-    }
-
-    placeRestraints(){   
-        let allElements = this.nodes.concat(this.edges)
-        Phaser.Utils.Array.Shuffle(allElements)
-        allElements.forEach(element => {
-            element.addRestraints();
-        })
     }
     drawRestraints(){
         this.restraintTexts.forEach(text => {
@@ -321,7 +331,6 @@ class MainScene extends Phaser.Scene {
             }
         })
     }
-
     drawNode(node){
         let color
         if(node.timesCrossed > 0){
@@ -353,7 +362,13 @@ class MainScene extends Phaser.Scene {
         this.graphics.closePath();
         this.graphics.strokePath();
     }
+    printGrid(){
+        let nodeArray = []
+        let edgeArray = []
+        this.nodes.forEach(node => { nodeArray.push(node.numberRestraint) })
+        this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
 
-    update() {
+        console.log(nodeArray)
+        console.log(edgeArray)
     }
 }

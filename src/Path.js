@@ -9,7 +9,14 @@ class Path {
 
     generate(nodes){
         let invalid = true
+        let counter = 0;
         while(invalid){
+            counter++
+            if(counter == 1000){
+                console.log("Invalid puzzle settings")
+                return false
+            }
+
             invalid = false
             let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
             //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
@@ -83,8 +90,9 @@ class Path {
             //We still have edges to go, so keep looking
             let goesTheDistance = this.recursivePath(otherNode) 
             //If goesTheDistance is false, only leads to a dead end 
-            if(goesTheDistance){ return true }
-            else {
+            if(goesTheDistance){
+                return true 
+            } else {
                 selectedEdge.uncross()
                 otherNode.uncross()
                 this.dirsTravelled.pop()
