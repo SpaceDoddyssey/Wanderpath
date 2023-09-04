@@ -10,7 +10,7 @@ class MainScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
 
         // show game title text
-        this.add.text(10, 0, 'Spaghetti Plate', textConfig);
+        this.add.text(10, 0, 'Wanderpath', textConfig);
 
         var rnd = Phaser.Math.RND;
         rnd.init("Blah")
@@ -320,14 +320,14 @@ class MainScene extends Phaser.Scene {
             if(node.numberRestraint != -1){
                 this.restraintTexts.push(this.add.text((node.ScreenLoc())[0], 
                     (node.ScreenLoc())[1], 
-                    node.numberRestraint, restraintConfig).setOrigin(0.5));
+                    node.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
             }
         })
         this.edges.forEach(edge => {
             if(edge.numberRestraint != -1){
                 this.restraintTexts.push(this.add.text((edge.ScreenLoc())[0], 
                             (edge.ScreenLoc())[1], 
-                            edge.numberRestraint, restraintConfig).setOrigin(0.5));
+                            edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
             }
         })
     }

@@ -36,7 +36,7 @@ let textConfig = {
 let restraintConfig = {
     fontFamily: 'Georgia',
     fontSize: '28px',
-    color: '#1722E8',
+    color: '#CC1717',
     align: 'center'
 }
 
@@ -68,10 +68,9 @@ function enforceMinMax(field){
     if(field.value != ""){
         console.log("Minmax")
         if(parseInt(field.value) < parseInt(field.min)){
-        field.value = field.min;
-        }
-        if(parseInt(field.value) > parseInt(field.max)){
-        field.value = field.max;
+            field.value = field.min;
+        } else if(parseInt(field.value) > parseInt(field.max)){
+            field.value = field.max;
         }
     } else {
         field.value = field.min;
