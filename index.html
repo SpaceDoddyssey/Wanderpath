@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/jpg" href="assets/icon.jpg" sizes="96x96" />
-    <title>Spaghetti Plate</title>
+    <title>Wanderpath</title>
     <style>
         body {
             background-color: #1722E8;
@@ -35,6 +35,15 @@
 
     &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     <button type="button" id="regenerateGridButton">Regenerate Game</button>
+    
+    <label id="invalidParamsErrorText" style="background-color:#ff0404;"> </label>
+
+    <br><br><br>
+    <div id="game"></div>
+    <br><center><b>Wanderpath</b> is a new kind of puzzle game</center>
+    <br><center><b>The Goal:</b> Start on one of the large circular nodes and trace a path to the other node. If there is only one node, trace a path back to the starting point.</center>
+    <br><center><b>The Catch:</b> The path can cross over itself, and each edge or intersection with a number on it must be touched by the path exactly that many times. The path cannot double back.</center>
+    <br><center>Design and programming by <b>Cameron Dodd</b></center>
 
     <script src="./lib/phaser.js"></script>
     <script src="./src/MainScene.js"></script>

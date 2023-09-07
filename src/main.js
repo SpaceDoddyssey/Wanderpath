@@ -17,6 +17,7 @@ let config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: defaultDimensions[0],
     height: defaultDimensions[1],
+    parent: "game",
     scene:[ MainScene ]
 }
 
@@ -24,7 +25,7 @@ let config = {
 let textConfig = {
     fontFamily: 'Georgia',
     fontSize: '28px',
-    color: '#843605',
+    color: '#E8DD17',
     align: 'right',
     padding: {
         top: 5,
@@ -36,7 +37,7 @@ let textConfig = {
 let restraintConfig = {
     fontFamily: 'Georgia',
     fontSize: '28px',
-    color: '#CC1717',
+    color: '#ff0404',
     align: 'center'
 }
 

@@ -10,28 +10,24 @@ class MainScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
 
         // show game title text
-        this.add.text(10, 0, 'Wanderpath', textConfig);
+        this.add.text(10, 10, 'Wanderpath', textConfig);
 
         var rnd = Phaser.Math.RND;
-        rnd.init("Blah")
+        rnd.init("Seed") //Note: This does not seem to do anything :|
 
-        // define keys
+        // define keys      Note: Not currently used
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
-        const generateButton = this.add.text(10, 70, 'Generate new puzzle', { fill: '#0f0' });
-        generateButton.setInteractive();
-        generateButton.on('pointerdown', () => { 
-            this.resetGrid()
-            let allElements = this.nodes.concat(this.edges)
-            allElements.forEach(el => { el.maxCrosses = maxCrosses })
-            this.generatePuzzle(gridWidth, gridHeight);
-            this.drawGrid();
-        });
+        //Create text in game canvas that generates new puzzle with existing parameters
+        const generateButtonText = this.add.text(10, 70, 'Generate new puzzle', { fill: '#0f0' });
+        generateButtonText.setInteractive();
+        generateButtonText.on('pointerdown', () => { this.generateButtonFunction() } );
 
-        document.getElementById('regenerateGridButton').onclick = this.regenerateScene.bind(this);
+        //Hook up the button that regenerates the whole game with new given parameters
+        document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
         
         this.restraintTexts = []
 
@@ -41,6 +37,13 @@ class MainScene extends Phaser.Scene {
         this.drawGrid();
     }
 
+    generateButtonFunction(){
+        this.resetGrid()
+        let allElements = this.nodes.concat(this.edges)
+        allElements.forEach(el => { el.maxCrosses = maxCrosses })
+        this.generatePuzzle(gridWidth, gridHeight);
+        this.drawGrid();
+    }
     generatePuzzle(width, height){
         console.clear()
 
@@ -202,16 +205,16 @@ class MainScene extends Phaser.Scene {
             if(solutions > 1) return solutions
         }
 
-        if(solutions > 0){
-            //console.log("Branch with ", solutions, " solutions")
-        }
+        // if(solutions > 0){
+        //     console.log("Branch with ", solutions, " solutions")
+        // }
         return solutions
     }
 
     allRestraintsSatisfied(){
         let allElements = this.nodes.concat(this.edges)
         let counter = 0
-        for(let i = 0; i < allElements.length; i++){
+        for(let i = 0; i < allElements.length; i++){    
             let element = allElements[i];
             counter++
             //console.log("Checking element " + counter);
@@ -227,12 +230,28 @@ class MainScene extends Phaser.Scene {
 //############ MANIPULATING THE GRID ############    
 //###############################################
 
-    regenerateScene(){
-        gridWidth  = document.getElementById('widthField').value
-        gridHeight = document.getElementById('heightField').value
-        maxLength  = document.getElementById('lengthField').value
-        maxCrosses = document.getElementById('maxCrossingField').value
+    regenerateWholeScene(){
+        //Get the new parameters
+        let newGW = document.getElementById('widthField').value
+        let newGH = document.getElementById('heightField').value
+        let newML = document.getElementById('lengthField').value
+        let newMC = document.getElementById('maxCrossingField').value
         
+        //Check that the parameters are valid
+        //The maximum path length is (width * height - 1) * maxCrossings
+        let errorMessage = document.getElementById("invalidParamsErrorText");
+        if(newML > (newGW * newGH - 1) * newMC){ 
+            errorMessage.innerHTML = "Invalid settings! Length > (Width * Height - 1) * Max Crosses"
+            return;
+        } else {
+            errorMessage.innerHTML = ""
+        }
+
+        gridWidth  = newGW;
+        gridHeight = newGH;
+        maxLength  = newML;
+        maxCrosses = newMC;
+
         let newDim = newDimensions(gridWidth, gridHeight);
         game.scale.resize(newDim[0], newDim[1]);
         
