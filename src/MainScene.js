@@ -22,7 +22,7 @@ class MainScene extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
         //Create text in game canvas that generates new puzzle with existing parameters
-        const generateButtonText = this.add.text(10, 70, 'Generate new puzzle', { fill: '#0f0' });
+        const generateButtonText = this.add.text(10, 70, 'Generate new puzzle', { fill: '#D9CAB3' });
         generateButtonText.setInteractive();
         generateButtonText.on('pointerdown', () => { this.generateButtonFunction() } );
 
@@ -241,7 +241,7 @@ class MainScene extends Phaser.Scene {
         //The maximum path length is (width * height - 1) * maxCrossings
         let errorMessage = document.getElementById("invalidParamsErrorText");
         if(newML > (newGW * newGH - 1) * newMC){ 
-            errorMessage.innerHTML = "Invalid settings! Length > (Width * Height - 1) * Max Crosses"
+            errorMessage.innerHTML = "<b>Invalid settings!</b> Length > (Width * Height - 1) * Max Crosses"
             return;
         } else {
             errorMessage.innerHTML = ""

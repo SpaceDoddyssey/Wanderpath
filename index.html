@@ -7,41 +7,45 @@
     <link rel="icon" type="image/jpg" href="assets/icon.jpg" sizes="96x96" />
     <title>Wanderpath</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
         body {
-            background-color: #1722E8;
+            font-family: 'Open Sans', Regular;
+            background-color: #83BCFF;
         }
     </style>
 </head>
+
 <body>
-    &nbsp&nbsp&nbsp&nbsp
-    <label for="widthField" style="background-color:#E8DD17;">Width (3-10):</label>
+    &nbsp
+    <label for="widthField" style="background-color:#00F6ED;">Width (3-10):</label>
     <input type="number" id="widthField" name="widthField" required onkeyup=enforceMinMax(this)
         min="3" max="10" value="3">
 
     &nbsp&nbsp&nbsp&nbsp
-    <label for="heightField" style="background-color:#E8DD17;">Height (3-10):</label>
+    <label for="heightField" style="background-color:#00F6ED;">Height (3-10):</label>
     <input type="number" id="heightField" name="heightField" required onkeyup=enforceMinMax(this)
         min="3" max="10" value="3">
 
     &nbsp&nbsp&nbsp&nbsp
-    <label for="lengthField" style="background-color:#E8DD17;">Path Length (5-40)</label>
+    <label for="lengthField" style="background-color:#00F6ED;">Path Length (5-40)</label>
     <input type="number" id="lengthField" name="lengthField" required onkeyup=enforceMinMax(this)
         min="5" max="40" value="10">
 
     &nbsp&nbsp&nbsp&nbsp
-    <label for="maxCrossingField" style="background-color:#E8DD17;">Max Cross Capacity (1-5)</label>
+    <label for="maxCrossingField" style="background-color:#00F6ED;">Max Cross Capacity (1-5)</label>
     <input type="number" id="maxCrossingField" name="maxCrossingField" required onkeyup=enforceMinMax(this)
         min="1" max="5" value="4">
 
-    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    <br>
+    &nbsp
     <button type="button" id="regenerateGridButton">Regenerate Game</button>
     
     <label id="invalidParamsErrorText" style="background-color:#ff0404;"> </label>
 
-    <br><br><br>
+    <br>
     <div id="game"></div>
-    <br><center><b>Wanderpath</b> is a new kind of puzzle game</center>
-    <br><center><b>The Goal:</b> Start on one of the large circular nodes and trace a path to the other node. If there is only one node, trace a path back to the starting point.</center>
+    <p style="line-height:5px;"></p><center><b>Wanderpath</b> is a new kind of puzzle game</center>
+    <p style="line-height:5px;"></p><center><b>The Goal:</b> Start on one of the large circular nodes and trace a path to the other node. If there is only one node, trace a path back to the starting point.</center>
     <br><center><b>The Catch:</b> The path can cross over itself, and each edge or intersection with a number on it must be touched by the path exactly that many times. The path cannot double back.</center>
     <br><center>Design and programming by <b>Cameron Dodd</b></center>
 

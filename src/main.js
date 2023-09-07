@@ -25,7 +25,7 @@ let config = {
 let textConfig = {
     fontFamily: 'Georgia',
     fontSize: '28px',
-    color: '#E8DD17',
+    color: '#00F6ED',
     align: 'right',
     padding: {
         top: 5,
