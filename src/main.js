@@ -1,6 +1,6 @@
 let UIspacerheight = 64;
-let borderPadding = 64;
-let sizePerUnit = 64;
+let borderPadding = 32;
+let sizePerUnit = 92;
 
 let gridWidth  = document.getElementById('widthField').value
 let gridHeight = document.getElementById('heightField').value
@@ -21,7 +21,6 @@ let config = {
     scene:[ MainScene ]
 }
 
-// text configuration
 let textConfig = {
     fontFamily: 'Georgia',
     fontSize: '28px',

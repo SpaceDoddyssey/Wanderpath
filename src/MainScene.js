@@ -3,33 +3,29 @@ class MainScene extends Phaser.Scene {
         super("mainScene");
     }
 
-    preload() {
-    }
-
     create() {
         this.graphics = this.add.graphics();
-
-        // show game title text
-        this.add.text(10, 10, 'Wanderpath', textConfig);
+        this.restraintTexts = []
 
         var rnd = Phaser.Math.RND;
         rnd.init("Seed") //Note: This does not seem to do anything :|
 
-        // define keys      Note: Not currently used
+        // define keys     Note: Not currently used
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
+        // show game title text
+        this.add.text(20, 10, 'Wanderpath', textConfig);
+
         //Create text in game canvas that generates new puzzle with existing parameters
-        const generateButtonText = this.add.text(10, 70, 'Generate new puzzle', { fill: '#D9CAB3' });
+        const generateButtonText = this.add.text(20, 70, 'Generate new puzzle', { fill: '#D9CAB3',fontFamily: 'Open Sans, "Regular"' });
         generateButtonText.setInteractive();
         generateButtonText.on('pointerdown', () => { this.generateButtonFunction() } );
 
         //Hook up the button that regenerates the whole game with new given parameters
         document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
-        
-        this.restraintTexts = []
 
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
@@ -67,12 +63,10 @@ class MainScene extends Phaser.Scene {
         let allElements = this.nodes.concat(this.edges);
         Phaser.Utils.Array.Shuffle(allElements);
 
-        //let removed = this.tryRemoveRestraint(this.nodes[0]);   
-
         this.drawGrid()
-
         this.printGrid()
 
+        //Remove restraints until we can't remove any more without breaking uniqueness
         while(redundantRestraintsLeft){
             redundantRestraintsLeft = false;
             allElements.forEach(element => {
@@ -241,7 +235,7 @@ class MainScene extends Phaser.Scene {
         //The maximum path length is (width * height - 1) * maxCrossings
         let errorMessage = document.getElementById("invalidParamsErrorText");
         if(newML > (newGW * newGH - 1) * newMC){ 
-            errorMessage.innerHTML = "<b>Invalid settings!</b> Length > (Width * Height - 1) * Max Crosses"
+            errorMessage.innerHTML = "<b>&nbspInvalid settings!</b><br>&nbspPath Length must be at most&nbsp<br>&nbsp(Width * Height - 1) * Max Crosses&nbsp"
             return;
         } else {
             errorMessage.innerHTML = ""
@@ -360,10 +354,10 @@ class MainScene extends Phaser.Scene {
 
         if(node.endPoint){
             let loc = node.ScreenLoc();
-            this.graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], 20)  
+            this.graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], 24)  
         } else {
             let loc = node.ScreenLoc();
-            this.graphics.fillStyle(color, 1).fillRect(loc[0] - 7, loc[1] - 7, 14, 14)
+            this.graphics.fillStyle(color, 1).fillRect(loc[0] - 9, loc[1] - 9, 18, 18)
         }
     }
     drawEdge(edge){
@@ -371,9 +365,9 @@ class MainScene extends Phaser.Scene {
         let toLoc   = edge.to.ScreenLoc();
 
         if(edge.timesCrossed > 0){
-            this.graphics.lineStyle(14, 0xFF0000, 1.0);
+            this.graphics.lineStyle(18, 0xFF0000, 1.0);
         } else {
-            this.graphics.lineStyle(14, 0xFFFFFF, 1.0);
+            this.graphics.lineStyle(18, 0xFFFFFF, 1.0);
         }
         this.graphics.beginPath();
         this.graphics.moveTo(fromLoc[0], fromLoc[1]);
