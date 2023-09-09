@@ -27,6 +27,7 @@ class MainScene extends Phaser.Scene {
         //Hook up the button that regenerates the whole game with new given parameters
         document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
 
+
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
 
@@ -59,26 +60,19 @@ class MainScene extends Phaser.Scene {
             }
         }
 
-        let redundantRestraintsLeft = true;
         let allElements = this.nodes.concat(this.edges);
         Phaser.Utils.Array.Shuffle(allElements);
 
         this.drawGrid()
         this.printGrid()
 
-        //Remove restraints until we can't remove any more without breaking uniqueness
-        while(redundantRestraintsLeft){
-            redundantRestraintsLeft = false;
-            allElements.forEach(element => {
-                let removed = this.tryRemoveRestraint(element);    
-                if(removed){
-                    redundantRestraintsLeft = true
-                }
-                this.drawGrid();
-            })
-        }
-
-        console.log("----------------- All Restraints removed.")
+        //Remove restraints that can be safely removed while maintaining uniqueness
+        allElements.forEach(element => {
+            this.tryRemoveRestraint(element);    
+            this.drawGrid();
+        })
+        
+        console.log("----------------- All Restraints removed. -----------------")
         this.checkSolutions();
     }
 
@@ -99,18 +93,19 @@ class MainScene extends Phaser.Scene {
 
             //If there is still only one solution, the restraint is safe to remove
             if(this.checkSolutions()){
-                console.log("Restraint successfully removed")
+                console.log("RC1 Restraint successfully removed")
                 return true;
             } else {
-                console.log("Restraint could not be removed")
+                console.log("RC1 Restraint could not be removed")
                 element.numberRestraint = restraint;
                 return false;
             }
         }
     }
 
+    // Called on an existing puzzle to check the number of possible solutions to the puzzle - used for restraint removal
     checkSolutions(){
-         // Check for solutions from the first of the two end nodes
+        // Check for solutions from the first of the two end nodes
         this.solutionNodeList = []
 
         let totalSolutions = 0
@@ -231,7 +226,7 @@ class MainScene extends Phaser.Scene {
         let newML = document.getElementById('lengthField').value
         let newMC = document.getElementById('maxCrossingField').value
         
-        //Check that the parameters are valid
+        //Check that the parameters are valid, display error message if necessary
         //The maximum path length is (width * height - 1) * maxCrossings
         let errorMessage = document.getElementById("invalidParamsErrorText");
         if(newML > (newGW * newGH - 1) * newMC){ 
@@ -255,6 +250,7 @@ class MainScene extends Phaser.Scene {
 
         this.drawGrid();
     }
+    
     resetGrid(){
         this.targetPath = null
         this.nodes.forEach(node => {
@@ -272,6 +268,7 @@ class MainScene extends Phaser.Scene {
         })
         this.restraintTexts = [];
     }
+    // Creates the edges and nodes for a grid of the requested size
     populateGrid(width, height){
         this.nodes = []
         this.edges = []
@@ -339,8 +336,8 @@ class MainScene extends Phaser.Scene {
         this.edges.forEach(edge => {
             if(edge.numberRestraint != -1){
                 this.restraintTexts.push(this.add.text((edge.ScreenLoc())[0], 
-                            (edge.ScreenLoc())[1], 
-                            edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
+                    (edge.ScreenLoc())[1], 
+                    edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
             }
         })
     }
@@ -375,6 +372,7 @@ class MainScene extends Phaser.Scene {
         this.graphics.closePath();
         this.graphics.strokePath();
     }
+    //Prints the grid to console for debug purposes
     printGrid(){
         let nodeArray = []
         let edgeArray = []

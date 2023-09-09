@@ -62,7 +62,7 @@ const dirNames = ["north", "south", "west", "east"]
 
 let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR;
 
-//Used to enforce minmax on the html fifieldds 
+//Used to enforce minmax on the html fields 
 function enforceMinMax(field){
     //First enforce minmax
     if(field.value != ""){

@@ -24,7 +24,6 @@ class GraphElement {
         if(!this.canCross) {
             return false
         } 
-
         this.timesCrossed++;
         return true;
     }
@@ -35,6 +34,7 @@ class GraphElement {
         }
 
         //cross and cancross are separate because they will probably get more complicated later
+        //and I may want to reference canCross without actually crossing
         if(this.timesCrossed < this.maxCrosses){
             return true
         } else {
