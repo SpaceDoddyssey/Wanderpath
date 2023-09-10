@@ -1,11 +1,14 @@
+// Note: This file is mostly used to store globals
+// Go to index.html for webpage stuff and MainScene.js for puzzle stuff
+
 let UIspacerheight = 64;
 let borderPadding = 32;
 let sizePerUnit = 92;
 
 let gridWidth  = document.getElementById('widthField').value
 let gridHeight = document.getElementById('heightField').value
-let maxLength  = document.getElementById('lengthField').value
-let maxCrosses = document.getElementById('maxCrossingField').value
+let maxLength  = document.getElementById('lengthField').value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound
+let maxCrosses = document.getElementById('maxCrossingField').value //Max times a node or edge can be crossed
 
 let defaultDimensions = newDimensions(gridWidth, gridHeight)
 

@@ -43,7 +43,7 @@ class GraphElement {
     }
 
     //This is probably unnecessary, I briefly thought it might be.
-    //Might as well keep it around in case it becomes useful
+    //Might as well keep it here in case it becomes useful
     // static dirBetween(from, to){
     //     let fromLoc = from.GridLoc();
     //     let toLoc = to.GridLoc();

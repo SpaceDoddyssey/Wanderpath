@@ -8,7 +8,7 @@ class MainScene extends Phaser.Scene {
         this.restraintTexts = []
 
         var rnd = Phaser.Math.RND;
-        rnd.init("Seed") //Note: This does not seem to do anything :|
+        rnd.init("Seed") //Note: This does not seem to do anything :| I need to figure out how to seed properly
 
         // define keys     Note: Not currently used
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -27,25 +27,24 @@ class MainScene extends Phaser.Scene {
         //Hook up the button that regenerates the whole game with new given parameters
         document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
 
-
+        //Create the elements of the base grid
         this.populateGrid(gridWidth, gridHeight);
+        //Generate a puzzle within the grid
         this.generatePuzzle(gridWidth, gridHeight);
 
         this.drawGrid();
     }
 
-    generateButtonFunction(){
-        this.resetGrid()
-        let allElements = this.nodes.concat(this.edges)
-        allElements.forEach(el => { el.maxCrosses = maxCrosses })
-        this.generatePuzzle(gridWidth, gridHeight);
-        this.drawGrid();
-    }
+//###################################################################################################################
+//############################################## GENERATING THE PUZZLE ##############################################    
+//###################################################################################################################
+
     generatePuzzle(width, height){
         console.clear()
 
-        let valid = false;
-        while(!valid){
+        let validPuzzle = false;
+        //First generate a valid path
+        while(!validPuzzle){
             this.targetPath = new Path()
             this.targetPath.generate(this.nodes, maxLength)
 
@@ -54,26 +53,28 @@ class MainScene extends Phaser.Scene {
             this.nodes.forEach(node => { node.timesCrossed = 0 })
             this.edges.forEach(edge => { edge.timesCrossed = 0 })
 
-            valid = this.checkSolutions()
-            if(!valid){
+            validPuzzle = this.checkSolutions()
+            if(!validPuzzle){
                 this.resetGrid()
             }
         }
 
+        this.printGrid() //Debug
+
+        //Get a list of all the elements and shuffle them
         let allElements = this.nodes.concat(this.edges);
         Phaser.Utils.Array.Shuffle(allElements);
-
-        this.drawGrid()
-        this.printGrid()
-
-        //Remove restraints that can be safely removed while maintaining uniqueness
+        
+        //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
         allElements.forEach(element => {
+            let allElements = this.nodes.concat(this.edges);
+            Phaser.Utils.Array.Shuffle(allElements);
             this.tryRemoveRestraint(element);    
-            this.drawGrid();
         })
         
-        console.log("----------------- All Restraints removed. -----------------")
-        this.checkSolutions();
+        console.log("----------------- \nAll Restraints removed. \n-----------------")
+        this.checkSolutions(); //Here for debug purposes
+        this.drawGrid()
     }
 
     tryRemoveRestraint(element){
@@ -103,7 +104,8 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    // Called on an existing puzzle to check the number of possible solutions to the puzzle - used for restraint removal
+    // Called on an existing puzzle to check the number of possible solutions to the puzzle 
+    // Used for restraint removal
     checkSolutions(){
         // Check for solutions from the first of the two end nodes
         this.solutionNodeList = []
@@ -150,7 +152,10 @@ class MainScene extends Phaser.Scene {
                 //console.log("Touched the end - restraints not satisfied, continuing")
             }
         }
+        //Past this point we know we are not already on a solution, so we need to keep looking
+
         let solutions = 0 
+        //Note: I wanted to abort early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
 
         for(let i = 0; i < 4; i++) {
             let curDir = i;
@@ -183,14 +188,15 @@ class MainScene extends Phaser.Scene {
             //As far as we can tell from here this edge is valid, so let's cross it
             edge.cross();
             otherNode.cross()
-            this.solutionNodeList.push(otherNode.ID)
-            length++
-            solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
-            length--
-            this.solutionNodeList.pop()
+                this.solutionNodeList.push(otherNode.ID)
+                length++
+                    solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
+                length--
+                this.solutionNodeList.pop()
             edge.uncross();
             otherNode.uncross()
-
+//!!! TODO: Why is it ever finding more than 2 solutions? 
+//!!! Shouldn't it be aborting all the way once it finds two solutions? 
             if(solutions > 1) return solutions
         }
 
@@ -214,11 +220,21 @@ class MainScene extends Phaser.Scene {
         }
         return true
     }
+    
+    //This function is called when the user clicks the Generate New Puzzle button inside the Phaser scene
+    generateButtonFunction(){
+        this.resetGrid()
+        let allElements = this.nodes.concat(this.edges)
+        allElements.forEach(el => { el.maxCrosses = maxCrosses })
+        this.generatePuzzle(gridWidth, gridHeight);
+        this.drawGrid();
+    }
 
-//###############################################
-//############ MANIPULATING THE GRID ############    
-//###############################################
+//###################################################################################################################
+//############################################## MANIPULATING THE GRID ##############################################    
+//###################################################################################################################
 
+    //This function is called when the user clicks the Regenerate Game button on the left side of the page
     regenerateWholeScene(){
         //Get the new parameters
         let newGW = document.getElementById('widthField').value
@@ -305,9 +321,9 @@ class MainScene extends Phaser.Scene {
         })
     }
 
-//##########################################
-//############ DRAWING THE GRID ############    
-//##########################################
+//##############################################################################################################
+//############################################## DRAWING THE GRID ##############################################    
+//##############################################################################################################
 
     drawGrid(){
         this.graphics.clear();
