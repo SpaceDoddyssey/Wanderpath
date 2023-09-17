@@ -5,6 +5,9 @@ let UIspacerheight = 64;
 let borderPadding = 32;
 let sizePerUnit = 92;
 
+let hasOneWayStreets = false; //Future feature
+let num_solutions = 0;
+
 let gridWidth  = document.getElementById('widthField').value
 let gridHeight = document.getElementById('heightField').value
 let maxLength  = document.getElementById('lengthField').value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound

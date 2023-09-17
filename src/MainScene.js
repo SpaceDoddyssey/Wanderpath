@@ -15,14 +15,10 @@ class MainScene extends Phaser.Scene {
         keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
         // show game title text
         this.add.text(20, 10, 'Wanderpath', textConfig);
-
-        //Create text in game canvas that generates new puzzle with existing parameters
-        const generateButtonText = this.add.text(20, 70, 'Generate new puzzle', { fill: '#D9CAB3',fontFamily: 'Open Sans, "Regular"' });
-        generateButtonText.setInteractive();
-        generateButtonText.on('pointerdown', () => { this.generateButtonFunction() } );
 
         //Hook up the button that regenerates the whole game with new given parameters
         document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
@@ -33,6 +29,10 @@ class MainScene extends Phaser.Scene {
         this.generatePuzzle(gridWidth, gridHeight);
 
         this.drawGrid();
+    }
+    update(){ 
+        //TODO: Not working
+        if (Phaser.Input.Keyboard.JustDown(keyR)) { this.regenerateWholeScene; }
     }
 
 //###################################################################################################################
@@ -63,12 +63,10 @@ class MainScene extends Phaser.Scene {
 
         //Get a list of all the elements and shuffle them
         let allElements = this.nodes.concat(this.edges);
-        Phaser.Utils.Array.Shuffle(allElements);
+        // Phaser.Utils.Array.Shuffle(allElements); //Maybe adds something? Not sure
         
         //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
         allElements.forEach(element => {
-            let allElements = this.nodes.concat(this.edges);
-            Phaser.Utils.Array.Shuffle(allElements);
             this.tryRemoveRestraint(element);    
         })
         
@@ -113,7 +111,8 @@ class MainScene extends Phaser.Scene {
         let totalSolutions = 0
         endNode1.cross()
         this.solutionNodeList.push(endNode1.ID)
-        let num_solutions = this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
+        num_solutions = 0;
+        this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
         console.log("Found " + num_solutions + " solutions from start node 1")
         if(num_solutions > 1) {
             endNode1.uncross()
@@ -123,18 +122,23 @@ class MainScene extends Phaser.Scene {
         totalSolutions += num_solutions;
 
         // Check for solutions from the second of the two end nodes
-        endNode2.cross()
-        this.solutionNodeList.pop()
-        this.solutionNodeList.push(endNode2.ID)
-        num_solutions = this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint, 0);
-        this.solutionNodeList.pop()
-        console.log("Found " + num_solutions + " solutions from start node 2")
-        if(num_solutions > 1) {
+        // Note: Currently unused 
+        //     - this is only necessary if we have One Way Street constraints, which are not currently implemented
+        if(hasOneWayStreets){
+            endNode2.cross()
+            this.solutionNodeList.pop()
+            this.solutionNodeList.push(endNode2.ID)
+            num_solutions = 0;
+            this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint, 0);
+            this.solutionNodeList.pop()
+            console.log("Found " + num_solutions + " solutions from start node 2")
+            if(num_solutions > 1) {
+                endNode2.uncross()
+                return false
+            }
             endNode2.uncross()
-            return false
+            totalSolutions += num_solutions;
         }
-        endNode2.uncross()
-        totalSolutions += num_solutions;
 
         if (totalSolutions < 1) return false
 
@@ -143,18 +147,23 @@ class MainScene extends Phaser.Scene {
 
     recursiveSolutionFinder(node, goalNode, lastDir, length){
         //console.log("Checking node " + node.ID)
+
+        //NEWDEBUG
+        //this.drawGrid();
+        //NEWDEBuG
+
         if(node == goalNode && lastDir != Dirs.Endpoint) { 
             if(this.allRestraintsSatisfied()) {
                 console.log("Found a solution")
                 console.log(this.solutionNodeList)
-                return 1 
+                num_solutions += 1;
+                return
             } else {
                 //console.log("Touched the end - restraints not satisfied, continuing")
             }
         }
         //Past this point we know we are not already on a solution, so we need to keep looking
 
-        let solutions = 0 
         //Note: I wanted to abort early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
 
         for(let i = 0; i < 4; i++) {
@@ -190,20 +199,18 @@ class MainScene extends Phaser.Scene {
             otherNode.cross()
                 this.solutionNodeList.push(otherNode.ID)
                 length++
-                    solutions += this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
+                    this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
                 length--
                 this.solutionNodeList.pop()
             edge.uncross();
             otherNode.uncross()
-//!!! TODO: Why is it ever finding more than 2 solutions? 
-//!!! Shouldn't it be aborting all the way once it finds two solutions? 
-            if(solutions > 1) return solutions
+            if(num_solutions > 1) return
         }
 
         // if(solutions > 0){
         //     console.log("Branch with ", solutions, " solutions")
         // }
-        return solutions
+        return
     }
 
     allRestraintsSatisfied(){
@@ -219,15 +226,6 @@ class MainScene extends Phaser.Scene {
             }
         }
         return true
-    }
-    
-    //This function is called when the user clicks the Generate New Puzzle button inside the Phaser scene
-    generateButtonFunction(){
-        this.resetGrid()
-        let allElements = this.nodes.concat(this.edges)
-        allElements.forEach(el => { el.maxCrosses = maxCrosses })
-        this.generatePuzzle(gridWidth, gridHeight);
-        this.drawGrid();
     }
 
 //###################################################################################################################
@@ -315,7 +313,6 @@ class MainScene extends Phaser.Scene {
     }
     placeRestraints(){   
         let allElements = this.nodes.concat(this.edges)
-        Phaser.Utils.Array.Shuffle(allElements)
         allElements.forEach(element => {
             element.addRestraints();
         })
@@ -382,12 +379,20 @@ class MainScene extends Phaser.Scene {
         } else {
             this.graphics.lineStyle(18, 0xFFFFFF, 1.0);
         }
+
+        //NEWDEBUG
+        // let shade = edge.numberRestraint * 10;
+        // if (shade > 255) shade = 255;
+        // let color = 0x004040 + (shade << 16);
+        // this.graphics.lineStyle(18, color, 1.0);
+        //NEWDEBUG
+
         this.graphics.beginPath();
         this.graphics.moveTo(fromLoc[0], fromLoc[1]);
         this.graphics.lineTo(toLoc[0], toLoc[1]);
-        this.graphics.closePath();
-        this.graphics.strokePath();
+        this.graphics.stroke();
     }
+
     //Prints the grid to console for debug purposes
     printGrid(){
         let nodeArray = []
