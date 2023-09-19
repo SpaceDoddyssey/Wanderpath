@@ -1,80 +1,72 @@
 <!DOCTYPE html>
-<html lan="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/jpg" href="assets/icon.jpg" sizes="96x96" />
+    <link rel="icon" type="image/jpg" href="assets/icon.jpg" sizes="96x96">
     <title>Wanderpath</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
         body {
             font-family: 'Open Sans', Regular;
             background-color: #83BCFF;
+            grid-template:
+                "col1 col2 col3" 1fr
+                / 33.33vw 33.33vw 33.33vw;
+        }
+        .num-field-col {
+            position: absolute;
+            display: flex;
+            flex-direction: column; 
+        }
+        .center-text {
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    
-    <div class="column" style="
-        position: absolute;
-        display: flex;
-        flex-direction: column;">
-    
-    <br>
-    <!-- Field for the width of the grid -->
-    <div class="flex-row">
-        <input type="number" id="widthField" name="widthField" style="width:40px" required onkeyup=enforceMinMax(this)
-            min="3" max="10" value="3">
-        <label for="widthField" style="background-color:#00F6ED;">Width (3-10)</label>
-    </div>
+    <div id="numFieldCol" class="column num-field-col" style="grid-area:col1">
+        <!-- First we create the parameter fields and associated labels -->
+        <script>
+            // First define a function to reduce code duplication
+            function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
+                const div = document.createElement("div");
+                div.classList.add("flex-row");
+                div.innerHTML = `<input type="number" id="${id}" name="${id}" style="width:40px" required 
+                                onkeyup="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
+                                <label for="${labelFor}" style="background-color:#00F6ED;">${labelText} (${minVal}-${maxVal})</label>
+                                <br><br>`;
+                document.getElementById("numFieldCol").appendChild(div);
+            }
 
-    <br>
-    <!-- Field for the height of the grid -->
-    <div class="flex-row">
-        <input type="number" id="heightField" name="heightField" style="width:40px" required onkeyup=enforceMinMax(this)
-            min="3" max="10" value="3">
-        <label for="heightField" style="background-color:#00F6ED;">Height (3-10)</label>
-    </div>
+            // Now call the function to actually create the fields
+            createNumberFieldAndLabel("widthField",       "widthField",       "Width",              3,  3, 10);
+            createNumberFieldAndLabel("heightField",      "heightField",      "Height",             3,  3, 10);
+            createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, 5, 40);
+            createNumberFieldAndLabel("maxCrossingField", "maxCrossingField", "Max Cross Capacity", 4,  1, 5);
+        </script>
 
-    <br>
-    <!-- Field for the length of the path -->
-    <div class="flex-row">
-        <input type="number" id="lengthField" name="lengthField" style="width:40px" required onkeyup=enforceMinMax(this)
-            min="5" max="40" value="12">
-        <label for="lengthField" style="background-color:#00F6ED;">Path Length (5-40)</label>
-    </div>
+        <!-- Button to regenerate the grid -->
+        <div class="flex-row">
+        <button type="button" id="regenerateGridButton">Regenerate Game</button>
+        </div>
 
-    <br>
-    <!-- Field for the maximum number of times a node/edge can be crossed -->
-    <div class="flex-row">
-        <input type="number" id="maxCrossingField" name="maxCrossingField" style="width:40px" required onkeyup=enforceMinMax(this)
-            min="1" max="5" value="4">
-        <label for="maxCrossingField" style="background-color:#00F6ED;">Max Cross Capacity (1-5)</label>
+        <!-- Spot for a warning label if you entered invalid parameters -->
+        <label id="invalidParamsErrorText" style="background-color:#ff0404;"> </label>
     </div>
-
-    <br>
-    <!-- Button to regenerate the grid -->
-    <div class="flex-row">
-    <button type="button" id="regenerateGridButton">Regenerate Game</button>
-    </div>
-
-    <!-- Spot for a warning label if you entered invalid parameters -->
-    <label id="invalidParamsErrorText" style="background-color:#ff0404;"> </label>
-    </div><!-- End of column div -->
     
     <br>
-    <div class="column">
+    <div class="column" style="grid-area:col2">
         <!-- Spot for the Phaser canvas -->
         <div id="game"></div>
     </div>
 
     <!-- Descriptive text -->
-    <p style="line-height:5px;"><center><b>Wanderpath</b> is a new kind of puzzle game</center>
-    <p style="line-height:5px;"><center><b>The Goal:</b> Start on one of the large circular nodes and trace a path to the other node. If there is only one node, trace a path back to the starting point.</center>
-    <p style="line-height:5px;"><center><b>The Catch:</b> The path can cross over itself, and each edge or intersection with a number on it must be touched by the path exactly that many times. The path cannot double back.</center>
-    <p style="line-height:5px;"><center>Design and programming by <b>Cameron Dodd</b></center>
+    <p class="center-text"><b>Wanderpath</b> is a new kind of puzzle game</p>
+    <p class="center-text"><b>The Goal:</b> Start on one of the large circular nodes and trace a path to the other node. If there is only one node, trace a path back to the starting point.</p>
+    <p class="center-text"><b>The Catch:</b> The path can cross over itself, and each edge or intersection with a number on it must be touched by the path exactly that many times. The path cannot double back.</p>
+    <p class="center-text">Design and programming by <b>Cameron Dodd</b></p>
 
     <!-- Imports -->
     <script src="./lib/phaser.js"></script>
