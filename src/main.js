@@ -48,7 +48,7 @@ let restraintConfig = {
 
 function newDimensions(newGridWidth, newGridHeight) {
     let w = (newGridWidth * sizePerUnit) + borderPadding * 2;
-    let h = (newGridHeight * sizePerUnit) + borderPadding * 2 + UIspacerheight;
+    let h = (newGridHeight * sizePerUnit) + borderPadding * 2;
     return [w, h];
 } 
 

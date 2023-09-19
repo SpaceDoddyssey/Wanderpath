@@ -18,7 +18,7 @@ class MainScene extends Phaser.Scene {
         keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
         // show game title text
-        this.add.text(20, 10, 'Wanderpath', textConfig);
+        this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
         //Hook up the button that regenerates the whole game with new given parameters
         document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
@@ -147,10 +147,6 @@ class MainScene extends Phaser.Scene {
 
     recursiveSolutionFinder(node, goalNode, lastDir, length){
         //console.log("Checking node " + node.ID)
-
-        //NEWDEBUG
-        //this.drawGrid();
-        //NEWDEBuG
 
         if(node == goalNode && lastDir != Dirs.Endpoint) { 
             if(this.allRestraintsSatisfied()) {
@@ -282,6 +278,7 @@ class MainScene extends Phaser.Scene {
         })
         this.restraintTexts = [];
     }
+
     // Creates the edges and nodes for a grid of the requested size
     populateGrid(width, height){
         this.nodes = []
