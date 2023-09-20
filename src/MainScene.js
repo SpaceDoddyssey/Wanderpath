@@ -231,20 +231,22 @@ class MainScene extends Phaser.Scene {
     //This function is called when the user clicks the Regenerate Game button on the left side of the page
     regenerateWholeScene(){
         //Get the new parameters
-        let newGW = document.getElementById('widthField').value
-        let newGH = document.getElementById('heightField').value
-        let newML = document.getElementById('lengthField').value
-        let newMC = document.getElementById('maxCrossingField').value
+        let newGW = widthField.value
+        let newGH = heightField.value
+        let newML = lengthField.value
+        let newMC = maxCrossField.value
         
         //Check that the parameters are valid, display error message if necessary
         //The maximum path length is (width * height - 1) * maxCrossings
         let errorMessage = document.getElementById("invalidParamsErrorText");
+
         if(newML > (newGW * newGH - 1) * newMC){ 
             errorMessage.innerHTML = "<b>&nbspInvalid settings!</b><br>&nbspPath Length must be at most&nbsp<br>&nbsp(Width * Height - 1) * Max Crosses&nbsp"
             return;
         } else {
             errorMessage.innerHTML = ""
         }
+
 
         gridWidth  = newGW;
         gridHeight = newGH;

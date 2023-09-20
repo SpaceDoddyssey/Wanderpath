@@ -7,15 +7,21 @@ let sizePerUnit = 92;
 
 let hasOneWayStreets = false; //Future feature
 let num_solutions = 0;
+let endNode1, endNode2
 
-let gridWidth  = document.getElementById('widthField').value
-let gridHeight = document.getElementById('heightField').value
-let maxLength  = document.getElementById('lengthField').value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound
-let maxCrosses = document.getElementById('maxCrossingField').value //Max times a node or edge can be crossed
+//Get references to the value fields
+let widthField    = document.getElementById('widthField')
+let heightField   = document.getElementById('heightField')
+let lengthField   = document.getElementById('lengthField')
+let maxCrossField = document.getElementById('maxCrossingField')
+
+//Get the values
+let gridWidth  = widthField.value
+let gridHeight = heightField.value
+let maxLength  = lengthField.value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound
+let maxCrosses = maxCrossField.value //Max times a node or edge can be crossed
 
 let defaultDimensions = newDimensions(gridWidth, gridHeight)
-
-let endNode1, endNode2
 
 let config = {
     type: Phaser.CANVAS,
@@ -61,16 +67,13 @@ const Dirs = {
     Right: 3,
     Endpoint: 4
 }
-
 const InverseDirs = [Dirs.Down, Dirs.Up, Dirs.Right, Dirs.Left, Dirs.Endpoint]
-
 const dirNames = ["north", "south", "west", "east"]
 
 let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR;
 
-//Used to enforce minmax on the html fields 
+//Used to enforce in-range values on the html number fields 
 function enforceMinMax(field){
-    //First enforce minmax
     if(field.value != ""){
         console.log("Minmax")
         if(parseInt(field.value) < parseInt(field.min)){

@@ -34,7 +34,7 @@
                 const div = document.createElement("div");
                 div.classList.add("flex-row");
                 div.innerHTML = `<input type="number" id="${id}" name="${id}" style="width:40px" required 
-                                onkeyup="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
+                                onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
                                 <label for="${labelFor}" style="background-color:#00F6ED;">${labelText} (${minVal}-${maxVal})</label>
                                 <br><br>`;
                 document.getElementById("numFieldCol").appendChild(div);
