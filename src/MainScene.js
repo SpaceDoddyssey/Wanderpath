@@ -53,6 +53,8 @@ class MainScene extends Phaser.Scene {
             this.nodes.forEach(node => { node.timesCrossed = 0 })
             this.edges.forEach(edge => { edge.timesCrossed = 0 })
 
+            //First we make sure that we haven't ended up with a puzzle where there are 
+            //  multiple solutions even with all restraints active
             validPuzzle = this.checkSolutions()
             if(!validPuzzle){
                 this.resetGrid()
@@ -61,12 +63,10 @@ class MainScene extends Phaser.Scene {
 
         this.printGrid() //Debug
 
-        //Get a list of all the elements and shuffle them
-        let allElements = this.nodes.concat(this.edges);
-        // Phaser.Utils.Array.Shuffle(allElements); //Maybe adds something? Not sure
+        // Phaser.Utils.Array.Shuffle(this.allElements); //Maybe adds something? Not sure
         
         //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
-        allElements.forEach(element => {
+        this.allElements.forEach(element => {
             this.tryRemoveRestraint(element);    
         })
         
@@ -109,7 +109,6 @@ class MainScene extends Phaser.Scene {
         this.solutionNodeList = []
 
         let totalSolutions = 0
-        endNode1.cross()
         this.solutionNodeList.push(endNode1.ID)
         num_solutions = 0;
         this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
@@ -125,7 +124,6 @@ class MainScene extends Phaser.Scene {
         // Note: Currently unused 
         //     - this is only necessary if we have One Way Street constraints, which are not currently implemented
         if(hasOneWayStreets){
-            endNode2.cross()
             this.solutionNodeList.pop()
             this.solutionNodeList.push(endNode2.ID)
             num_solutions = 0;
@@ -146,12 +144,22 @@ class MainScene extends Phaser.Scene {
     }
 
     recursiveSolutionFinder(node, goalNode, lastDir, length){
-        //console.log("Checking node " + node.ID)
+        // let indent = "";
+        // for( let i=0; i<length; i++) indent = indent + " ";
+        // console.log( indent + "node " + node.ID + "  " + length )
+        
+        node.cross();
 
-        if(node == goalNode && lastDir != Dirs.Endpoint) { 
+        if(node == goalNode) { 
             if(this.allRestraintsSatisfied()) {
-                console.log("Found a solution")
-                console.log(this.solutionNodeList)
+                //console.log("Found a solution")
+                //console.log(this.solutionNodeList)
+                if(length != maxLength){
+                    //We've just found a solution that is not the same length as the intended solution
+                    //We know that the intended solution is still out there, so if this is the first solution we've found,
+                    //we know we can abort early, and we can do this by just adding an extra solution
+                    num_solutions += 1;
+                }
                 num_solutions += 1;
                 return
             } else {
@@ -160,7 +168,7 @@ class MainScene extends Phaser.Scene {
         }
         //Past this point we know we are not already on a solution, so we need to keep looking
 
-        //Note: I wanted to abort early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
+        //Note: Thought about aborting early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
 
         for(let i = 0; i < 4; i++) {
             let curDir = i;
@@ -183,16 +191,13 @@ class MainScene extends Phaser.Scene {
 
             //If the edge in that direction, or the node it leads to, can't be crossed, skip
             let otherNode = edge.otherNode(node);
-            let edgeCrossable = edge.canCross();
-            let nodeCrossable = otherNode.canCross();
-            if(!edgeCrossable || !nodeCrossable) {
+            if( !edge.canCross() || !otherNode.canCross()) {
                 //console.log("Can't be crossed"); 
                 continue
             }
 
             //As far as we can tell from here this edge is valid, so let's cross it
             edge.cross();
-            otherNode.cross()
                 this.solutionNodeList.push(otherNode.ID)
                 length++
                     this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
@@ -210,10 +215,9 @@ class MainScene extends Phaser.Scene {
     }
 
     allRestraintsSatisfied(){
-        let allElements = this.nodes.concat(this.edges)
         let counter = 0
-        for(let i = 0; i < allElements.length; i++){    
-            let element = allElements[i];
+        for(let i = 0; i < this.allElements.length; i++){    
+            let element = this.allElements[i];
             counter++
             //console.log("Checking element " + counter);
             if(element.restraintsSatisfied() == false) { 
@@ -246,7 +250,6 @@ class MainScene extends Phaser.Scene {
         } else {
             errorMessage.innerHTML = ""
         }
-
 
         gridWidth  = newGW;
         gridHeight = newGH;
@@ -309,10 +312,10 @@ class MainScene extends Phaser.Scene {
                 }
             }
         }
+        this.allElements = this.nodes.concat(this.edges);
     }
     placeRestraints(){   
-        let allElements = this.nodes.concat(this.edges)
-        allElements.forEach(element => {
+        this.allElements.forEach(element => {
             element.addRestraints();
         })
     }
