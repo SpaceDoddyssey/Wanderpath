@@ -16,7 +16,7 @@ class MainScene extends Phaser.Scene {
         keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-
+        
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
@@ -55,6 +55,8 @@ class MainScene extends Phaser.Scene {
 
             //First we make sure that we haven't ended up with a puzzle where there are 
             //  multiple solutions even with all restraints active
+            recursionLimitReached = false;
+            recursionCounter = 0;
             validPuzzle = this.checkSolutions()
             if(!validPuzzle){
                 this.resetGrid()
@@ -96,6 +98,7 @@ class MainScene extends Phaser.Scene {
                 return true;
             } else {
                 console.log("RC1 Restraint could not be removed")
+                recursionLimitReached = false;
                 element.numberRestraint = restraint;
                 return false;
             }
@@ -111,9 +114,10 @@ class MainScene extends Phaser.Scene {
         let totalSolutions = 0
         this.solutionNodeList.push(endNode1.ID)
         num_solutions = 0;
+        recursionCounter = 0;
         this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
         console.log("Found " + num_solutions + " solutions from start node 1")
-        if(num_solutions > 1) {
+        if(num_solutions > 1 || recursionLimitReached) {
             endNode1.uncross()
             return false
         }
@@ -127,10 +131,11 @@ class MainScene extends Phaser.Scene {
             this.solutionNodeList.pop()
             this.solutionNodeList.push(endNode2.ID)
             num_solutions = 0;
+            recursionCounter = 0;
             this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint, 0);
             this.solutionNodeList.pop()
             console.log("Found " + num_solutions + " solutions from start node 2")
-            if(num_solutions > 1) {
+            if(num_solutions > 1 || recursionLimitReached) {
                 endNode2.uncross()
                 return false
             }
@@ -147,7 +152,18 @@ class MainScene extends Phaser.Scene {
         // let indent = "";
         // for( let i=0; i<length; i++) indent = indent + " ";
         // console.log( indent + "node " + node.ID + "  " + length )
-        
+        recursionCounter += 1;
+
+        let recursiveDebug = true;
+        if(recursiveDebug){
+            // console.log("###### ", this.solutionNodeList);
+            if (recursionCounter % 50 == 0) { console.log(recursionCounter); }
+        }
+        if(recursionCounter >= recursionLimit){
+            recursionLimitReached = true;
+            return;
+        }
+
         node.cross();
 
         if(node == goalNode) { 
@@ -256,12 +272,16 @@ class MainScene extends Phaser.Scene {
         maxLength  = newML;
         maxCrosses = newMC;
 
+        errorMessage.innerHTML = "<b>&nbspGenerating...&nbsp</b>"
+
         let newDim = newDimensions(gridWidth, gridHeight);
         game.scale.resize(newDim[0], newDim[1]);
         
         this.resetGrid();
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
+        
+        errorMessage.innerHTML = ""
 
         this.drawGrid();
     }
