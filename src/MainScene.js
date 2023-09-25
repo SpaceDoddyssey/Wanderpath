@@ -43,12 +43,16 @@ class MainScene extends Phaser.Scene {
         console.clear()
 
         let validPuzzle = false;
+        let attempts = 0;
         //First generate a valid path
         while(!validPuzzle){
             this.targetPath = new Path()
             this.targetPath.generate(this.nodes, maxLength)
 
             this.placeRestraints();
+
+            console.log("==== initial restraints placed ====")
+            this.printGrid() //Debug
 
             this.nodes.forEach(node => { node.timesCrossed = 0 })
             this.edges.forEach(edge => { edge.timesCrossed = 0 })
@@ -59,13 +63,24 @@ class MainScene extends Phaser.Scene {
             recursionCounter = 0;
             validPuzzle = this.checkSolutions()
             if(!validPuzzle){
+                attempts += 1;
+                console.log("  ");
+                console.log("*** Puzzle not valid!  attempts = " + attempts );
+
+                if(attempts > 50){
+                    let errorMessage = document.getElementById("HtmlErrorLabel");
+                    errorMessage.innerHTML = "&nbspFailed to generate valid puzzle&nbsp"
+                    return;
+                }
+
                 this.resetGrid()
             }
         }
 
         this.printGrid() //Debug
 
-        // Phaser.Utils.Array.Shuffle(this.allElements); //Maybe adds something? Not sure
+        //Make sure we don't just remove all the node restraints before removing edge restraints
+        Phaser.Utils.Array.Shuffle(this.allElements);
         
         //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
         this.allElements.forEach(element => {
@@ -74,10 +89,13 @@ class MainScene extends Phaser.Scene {
         
         console.log("----------------- \nAll Restraints removed. \n-----------------")
         this.checkSolutions(); //Here for debug purposes
+
+        this.printGrid() //Debug
         this.drawGrid()
     }
 
     tryRemoveRestraint(element){
+        console.log("try remove const ", element.ID)
         if(element.numberRestraint == -1){
             //There's no restraint here to remove
             return false;
@@ -91,6 +109,8 @@ class MainScene extends Phaser.Scene {
             } else {
                 console.log("Attempting to remove restraint from edge ", element.ID)
             }
+
+            this.printGrid() //Debug
 
             //If there is still only one solution, the restraint is safe to remove
             if(this.checkSolutions()){
@@ -156,8 +176,10 @@ class MainScene extends Phaser.Scene {
 
         let recursiveDebug = true;
         if(recursiveDebug){
-            // console.log("###### ", this.solutionNodeList);
-            if (recursionCounter % 50 == 0) { console.log(recursionCounter); }
+            console.log(recursionCounter + "  " + this.solutionNodeList);
+            if (recursionCounter % 1000 == 0) { 
+                console.log(recursionCounter);
+            }
         }
         if(recursionCounter >= recursionLimit){
             recursionLimitReached = true;
@@ -185,6 +207,20 @@ class MainScene extends Phaser.Scene {
         //Past this point we know we are not already on a solution, so we need to keep looking
 
         //Note: Thought about aborting early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
+
+        if(node.numberRestraint != -1 && node.timesCrossed == node.numberRestraint){
+            let remainingOutboundCrosses = 0;
+            for(let i = 0; i < 4; i++){
+                let e = node.edges[i];
+                if (e != null && e.numberRestraint != -1){ 
+                    remainingOutboundCrosses += e.numberRestraint - e.timesCrossed
+                }
+                if(remainingOutboundCrosses > 1){
+                    console.log("Too many remaining outbound crosses!")
+                    return;
+                }
+            }
+        }
 
         for(let i = 0; i < 4; i++) {
             let curDir = i;
@@ -258,7 +294,7 @@ class MainScene extends Phaser.Scene {
         
         //Check that the parameters are valid, display error message if necessary
         //The maximum path length is (width * height - 1) * maxCrossings
-        let errorMessage = document.getElementById("invalidParamsErrorText");
+        let errorMessage = document.getElementById("HtmlErrorLabel");
 
         if(newML > (newGW * newGH - 1) * newMC){ 
             errorMessage.innerHTML = "<b>&nbspInvalid settings!</b><br>&nbspPath Length must be at most&nbsp<br>&nbsp(Width * Height - 1) * Max Crosses&nbsp"
@@ -272,7 +308,7 @@ class MainScene extends Phaser.Scene {
         maxLength  = newML;
         maxCrosses = newMC;
 
-        errorMessage.innerHTML = "<b>&nbspGenerating...&nbsp</b>"
+        // errorMessage.innerHTML = "<b>&nbspGenerating...&nbsp</b>"
 
         let newDim = newDimensions(gridWidth, gridHeight);
         game.scale.resize(newDim[0], newDim[1]);
@@ -281,7 +317,7 @@ class MainScene extends Phaser.Scene {
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
         
-        errorMessage.innerHTML = ""
+        // errorMessage.innerHTML = ""
 
         this.drawGrid();
     }
@@ -417,12 +453,74 @@ class MainScene extends Phaser.Scene {
 
     //Prints the grid to console for debug purposes
     printGrid(){
-        let nodeArray = []
-        let edgeArray = []
-        this.nodes.forEach(node => { nodeArray.push(node.numberRestraint) })
-        this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
+        //let nodeArray = []
+        //let edgeArray = []
+        //this.nodes.forEach(node => { nodeArray.push(node.numberRestraint) })
+        //this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
+        //console.log(nodeArray)
+        //console.log(edgeArray)
 
-        console.log(nodeArray)
-        console.log(edgeArray)
+        console.log("<Grid>")
+        for( var r=0; r<gridHeight; r++) {
+            let line = " ";
+            for( var c=0; c<gridWidth; c++) {
+                let id = (r*gridWidth) + c;
+                line += "[";
+                if ( id < 10) line += " ";
+                line = line + id + "]:";
+                let n = this.nodes[id];
+
+                if ( n.numberRestraint <  0) line += "##";
+                else {
+                    if ( n.numberRestraint < 10) line += " ";
+                         line += n.numberRestraint;
+                }
+
+                //if (n.edges[0]==null) line += "-"; else line += "e";  //U
+                //if (n.edges[1]==null) line += "-"; else line += "e";  //D
+                //if (n.edges[2]==null) line += "-"; else line += "e";  //L
+                //if (n.edges[3]==null) line += "-"; else line += "e";  //R
+ 
+                if (n.edges[3]==null) { //right edge
+                    line += "       ";
+                } else {
+                    let e = n.edges[3]; // right
+                    line += "  <";
+                    if ( e.ID < 10) line += " ";
+                    line = line + e.ID + ">:";
+                    if ( e.numberRestraint <  0) line += "##";
+                    else {
+                        if ( e.numberRestraint < 10) line += " ";
+                             line += e.numberRestraint;
+                    }
+                }
+                line += " ";
+            }
+            console.log( line );
+
+
+            line = " ";
+            for( let c=0; c<gridWidth; c++) {
+               let id = (r*gridWidth) + c;
+                let n = this.nodes[id];
+                 if (n.edges[1]==null) { //bottom edge
+                    line += "      ";
+                } else {
+                    let e = n.edges[1]; //bottom
+                    line += "<";  //R
+                    if ( e.ID < 10) line += " ";
+                    line = line + e.ID + ">:";
+
+                    if ( e.numberRestraint <  0) line += "##";
+                    else {
+                        if ( e.numberRestraint < 10) line += " ";
+                        line += e.numberRestraint;
+                    }
+                }
+                line += "          ";
+            }
+            console.log( line );
+        }
+        console.log(" ")
     }
 }

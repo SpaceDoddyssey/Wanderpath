@@ -2,6 +2,7 @@ class Path {
     constructor(){
         this.startNode = null;
         this.edgeList = [];
+        this.nodeList = [];
         this.dirsTravelled = [Dirs.Endpoint]
 
         this.allDirs = [Dirs.Up, Dirs.Down, Dirs.Left, Dirs.Right]
@@ -17,6 +18,9 @@ class Path {
                 return false
             }
 
+            this.edgeList = [];
+            this.nodeList = [];
+    
             invalid = false
             let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
             //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
@@ -28,6 +32,7 @@ class Path {
             curNode.cross()
             this.startNode = curNode;
 
+            this.nodeList.push( curNode );
             let validPath = this.recursivePath(curNode);
 
             if(!validPath){
@@ -38,8 +43,14 @@ class Path {
                 invalid = true
             }
         }
+
+        let edgeArray = []
+        this.edgeList.forEach(edge => { edgeArray.push(edge.ID) })
+        console.log("Path finished: EDGES: " + edgeArray)
+        let nodeArray = []
+        this.nodeList.forEach(node => { nodeArray.push(node.ID) })
+        console.log("Path finished: NODES: " + nodeArray)
         return true;
-            //console.log("Path finished: ", this.edgeList)
     }
     
     //Recursively moves in a random direction, pushing edges to the path, backing up if it can't move
@@ -76,6 +87,7 @@ class Path {
             otherNode.cross()
             this.dirsTravelled.push(curDir);
             this.edgeList.push(edge)
+            this.nodeList.push(otherNode)
             //console.log("Travelling " + dirNames[curDir]);
 
             //If we're at the desired distance, we're all done
@@ -98,6 +110,7 @@ class Path {
                 this.dirsTravelled.pop()
                 selectedEdge = null
                 this.edgeList.pop()
+                this.nodeList.pop()
                 continue
             }
         }
