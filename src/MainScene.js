@@ -429,8 +429,8 @@ class MainScene extends Phaser.Scene {
         }
     }
     drawEdge(edge){
-        let fromLoc = edge.from.ScreenLoc();
-        let toLoc   = edge.to.ScreenLoc();
+        let ALoc = edge.ANode.ScreenLoc();
+        let BLoc = edge.BNode.ScreenLoc();
 
         if(edge.timesCrossed > 0){
             this.graphics.lineStyle(18, 0xFF0000, 1.0);
@@ -446,8 +446,8 @@ class MainScene extends Phaser.Scene {
         //NEWDEBUG
 
         this.graphics.beginPath();
-        this.graphics.moveTo(fromLoc[0], fromLoc[1]);
-        this.graphics.lineTo(toLoc[0], toLoc[1]);
+        this.graphics.moveTo(ALoc[0], ALoc[1]);
+        this.graphics.lineTo(BLoc[0], BLoc[1]);
         this.graphics.stroke();
     }
 

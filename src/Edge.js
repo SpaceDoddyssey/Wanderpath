@@ -1,16 +1,16 @@
 class Edge extends GraphElement {
-    constructor(from, to, id) {
+    constructor(ANode, BNode, id) {
         super(id);
         
-        this.from = from;
-        this.to = to; //These are Nodes   
+        this.ANode = ANode;
+        this.BNode = BNode;  
     }
 
     ScreenLoc(){
-        let fromLoc = this.from.ScreenLoc();
-        let toLoc = this.to.ScreenLoc();
-        let x = (fromLoc[0] + toLoc[0]) / 2
-        let y = (fromLoc[1] + toLoc[1]) / 2
+        let ANodeLoc = this.ANode.ScreenLoc();
+        let BNodeLoc = this.BNode.ScreenLoc();
+        let x = (ANodeLoc[0] + BNodeLoc[0]) / 2
+        let y = (ANodeLoc[1] + BNodeLoc[1]) / 2
         return [x, y]
     }
 
@@ -23,8 +23,8 @@ class Edge extends GraphElement {
     }
 
     otherNode(node){
-        if(node == this.from) return this.to
-        if(node == this.to) return this.from
+        if(node == this.ANode) return this.BNode
+        if(node == this.BNode) return this.ANode
         console.log("otherNode called with invalide node")
         return
     }
