@@ -77,13 +77,13 @@ class Path {
 
             //If the edge in that direction, or the node it leads to, can't be crossed, skip
             let otherNode = edge.otherNode(node);
-            let edgeCrossable = edge.canCross();
+            let edgeCrossable = edge.canCross(node);
             let nodeCrossable = otherNode.canCross();
             if(!edgeCrossable || !nodeCrossable) continue
 
             //As far as we can tell from here this edge is valid, so let's cross it
             selectedEdge = edge;
-            edge.cross();
+            edge.cross(node);
             otherNode.cross()
             this.dirsTravelled.push(curDir);
             this.edgeList.push(edge)
@@ -105,7 +105,7 @@ class Path {
             if(goesTheDistance){
                 return true 
             } else {
-                selectedEdge.uncross()
+                selectedEdge.uncross(node)
                 otherNode.uncross()
                 this.dirsTravelled.pop()
                 selectedEdge = null

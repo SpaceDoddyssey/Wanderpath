@@ -40,10 +40,9 @@ class MainScene extends Phaser.Scene {
 //###################################################################################################################
 
     generatePuzzle(width, height){
-        console.clear()
-
         let validPuzzle = false;
         let attempts = 0;
+        console.clear();
         //First generate a valid path
         while(!validPuzzle){
             this.targetPath = new Path()
@@ -61,13 +60,23 @@ class MainScene extends Phaser.Scene {
             //  multiple solutions even with all restraints active
             recursionLimitReached = false;
             recursionCounter = 0;
-            validPuzzle = this.checkSolutions()
+            // if(!endNode1 || !endNode2){
+            //     console.log("Endnode broken???")
+            // }
+            let solutionsFromEN1 = this.checkSolutions(endNode1, endNode2);
+            let solutionsFromEN2 = 0;
+            if(hasOneWayStreets){
+                solutionsFromEN2 = this.checkSolutions(endNode2, endNode1);
+            }
+            //If there is exactly one solution from both end nodes or exactly one from one end node and 0 from the other
+            validPuzzle = ((solutionsFromEN1 == 1 && solutionsFromEN2 < 2) 
+                        || (solutionsFromEN2 == 1 && solutionsFromEN1 < 2))
             if(!validPuzzle){
                 attempts += 1;
                 console.log("  ");
                 console.log("*** Puzzle not valid!  attempts = " + attempts );
 
-                if(attempts > 50){
+                if(attempts > 500){
                     let errorMessage = document.getElementById("HtmlErrorLabel");
                     errorMessage.innerHTML = "&nbspFailed to generate valid puzzle&nbsp"
                     return;
@@ -79,93 +88,113 @@ class MainScene extends Phaser.Scene {
 
         this.printGrid() //Debug
 
-        //Make sure we don't just remove all the node restraints before removing edge restraints
-        Phaser.Utils.Array.Shuffle(this.allElements);
-        
-        //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
+        this.restraintList = [];
         this.allElements.forEach(element => {
-            this.tryRemoveRestraint(element);    
+            if(element.numberRestraint != -1){
+                this.restraintList.push([element, "Number"]);
+            }
+            if(element.oneWayRestraint){
+                hasOneWayStreets = true;
+                this.restraintList.push([element, "OneWay"]);
+            }
+        })
+        Phaser.Utils.Array.Shuffle(this.restraintList);
+
+        //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
+        this.restraintList.forEach(restraint => {
+            this.tryRemoveRestraint(restraint[0], restraint[1]);    
         })
         
         console.log("----------------- \nAll Restraints removed. \n-----------------")
-        this.checkSolutions(); //Here for debug purposes
 
         this.printGrid() //Debug
         this.drawGrid()
     }
 
-    tryRemoveRestraint(element){
-        console.log("try remove const ", element.ID)
-        if(element.numberRestraint == -1){
-            //There's no restraint here to remove
-            return false;
+    tryRemoveRestraint(element, typeToRemove){
+        console.log("xxxx " + element + typeToRemove);
+        if(element.elementType == "Node"){
+            console.log("Attempting to remove restraint from node at ", element.x, ", ", element.y)
         } else {
+            console.log("Attempting to remove restraint of type " + typeToRemove + " from edge ", element.ID)
+        }
+
+        let removedSuccessfuly = false;
+        let restraint = element.numberRestraint;
+        if(typeToRemove == "Number"){
             //Save and remove the restraint on the element
-            let restraint = element.numberRestraint;
             element.numberRestraint = -1;
 
-            if(element.x){
-                console.log("Attempting to remove restraint from node at ", element.x, ", ", element.y)
-            } else {
-                console.log("Attempting to remove restraint from edge ", element.ID)
-            }
-
             this.printGrid() //Debug
+        } else if (typeToRemove == "OneWay"){
+            element.oneWayRestraint = false;
 
-            //If there is still only one solution, the restraint is safe to remove
-            if(this.checkSolutions()){
-                console.log("RC1 Restraint successfully removed")
-                return true;
+            //Check if there are any one way streets remaining
+            hasOneWayStreets = false;
+            this.edges.forEach(edge => {
+                if(edge.oneWayRestraint) hasOneWayStreets = true; 
+            })
+        }
+
+        //Logic is the same for all restraint types
+        let solutionsFromEN1 = this.checkSolutions(endNode1, endNode2);
+        if(hasOneWayStreets){
+            //If there's more than one solution from EN1 we don't care how many from EN2
+            if(solutionsFromEN1 > 1){
+                removedSuccessfuly = false
             } else {
-                console.log("RC1 Restraint could not be removed")
-                recursionLimitReached = false;
-                element.numberRestraint = restraint;
-                return false;
+                let solutionsFromEN2 = this.checkSolutions(endNode2, endNode1);
+                //If there is either 1 solution from EN2, or no solutions from EN2 but 1 solutions from EN1, success 
+                if(solutionsFromEN2 == 1 || (solutionsFromEN1 == 1 && solutionsFromEN2 == 0)){
+                    removedSuccessfuly = true;
+                } else {
+                    removedSuccessfuly = false
+                }
             }
+        } else {
+            //In this case we know there are as many solutions from EN1 as EN2
+            if(solutionsFromEN1 == 1){
+                removedSuccessfuly = true;
+            } else {
+                removedSuccessfuly = false;
+            }
+        }
+
+        if(removedSuccessfuly){
+            console.log("RC1 " + typeToRemove + " restraint successfully removed")
+            return true;
+        } else {
+            if(typeToRemove == "Number"){
+                element.numberRestraint = restraint;
+            } else if (typeToRemove == "OneWay"){
+                element.oneWayRestraint = true;
+                hasOneWayStreets = true; 
+            }
+            console.log("RC1 " + typeToRemove + " restraint could not be removed")
+            recursionLimitReached = false;
+            return false;
         }
     }
 
     // Called on an existing puzzle to check the number of possible solutions to the puzzle 
     // Used for restraint removal
-    checkSolutions(){
+    checkSolutions(startNode, targetNode){
         // Check for solutions from the first of the two end nodes
         this.solutionNodeList = []
 
-        let totalSolutions = 0
-        this.solutionNodeList.push(endNode1.ID)
+        this.solutionNodeList.push(startNode.ID)
         num_solutions = 0;
         recursionCounter = 0;
-        this.recursiveSolutionFinder(endNode1, endNode2, Dirs.Endpoint, 0);
-        console.log("Found " + num_solutions + " solutions from start node 1")
-        if(num_solutions > 1 || recursionLimitReached) {
-            endNode1.uncross()
-            return false
-        }
-        endNode1.uncross()
-        totalSolutions += num_solutions;
-
-        // Check for solutions from the second of the two end nodes
-        // Note: Currently unused 
-        //     - this is only necessary if we have One Way Street constraints, which are not currently implemented
-        if(hasOneWayStreets){
-            this.solutionNodeList.pop()
-            this.solutionNodeList.push(endNode2.ID)
-            num_solutions = 0;
-            recursionCounter = 0;
-            this.recursiveSolutionFinder(endNode2, endNode1, Dirs.Endpoint, 0);
-            this.solutionNodeList.pop()
-            console.log("Found " + num_solutions + " solutions from start node 2")
-            if(num_solutions > 1 || recursionLimitReached) {
-                endNode2.uncross()
-                return false
-            }
-            endNode2.uncross()
-            totalSolutions += num_solutions;
+        this.recursiveSolutionFinder(startNode, targetNode, Dirs.Endpoint, 0);
+        console.log("Found " + num_solutions + " solutions from node " + startNode.ID)
+        startNode.uncross();
+        targetNode.uncross();
+        if(recursionLimitReached) {
+            console.log("Recursion limit reached");
+            return 100;
         }
 
-        if (totalSolutions < 1) return false
-
-        return true;
+        return num_solutions;
     }
 
     recursiveSolutionFinder(node, goalNode, lastDir, length){
@@ -189,8 +218,9 @@ class MainScene extends Phaser.Scene {
         node.cross();
 
         if(node == goalNode) { 
+            console.log("Reached goal node")
             if(this.allRestraintsSatisfied()) {
-                //console.log("Found a solution")
+                console.log("Found a solution")
                 //console.log(this.solutionNodeList)
                 if(length != maxLength){
                     //We've just found a solution that is not the same length as the intended solution
@@ -208,19 +238,20 @@ class MainScene extends Phaser.Scene {
 
         //Note: Thought about aborting early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
 
-        if(node.numberRestraint != -1 && node.timesCrossed == node.numberRestraint){
-            let remainingOutboundCrosses = 0;
-            for(let i = 0; i < 4; i++){
-                let e = node.edges[i];
-                if (e != null && e.numberRestraint != -1){ 
-                    remainingOutboundCrosses += e.numberRestraint - e.timesCrossed
-                }
-                if(remainingOutboundCrosses > 1){
-                    console.log("Too many remaining outbound crosses!")
-                    return;
-                }
-            }
-        }
+        //TODO
+        // if(node.numberRestraint != -1 && node.timesCrossed == node.numberRestraint){
+        //     let remainingOutboundCrosses = 0;
+        //     for(let i = 0; i < 4; i++){
+        //         let e = node.edges[i];
+        //         if (e != null && e.numberRestraint != -1){ 
+        //             remainingOutboundCrosses += e.numberRestraint - e.timesCrossed
+        //         }
+        //         if(remainingOutboundCrosses > 1){
+        //             console.log("Too many remaining outbound crosses!")
+        //             return;
+        //         }
+        //     }
+        // }
 
         for(let i = 0; i < 4; i++) {
             let curDir = i;
@@ -243,19 +274,19 @@ class MainScene extends Phaser.Scene {
 
             //If the edge in that direction, or the node it leads to, can't be crossed, skip
             let otherNode = edge.otherNode(node);
-            if( !edge.canCross() || !otherNode.canCross()) {
+            if( !edge.canCross(node) || !otherNode.canCross()) {
                 //console.log("Can't be crossed"); 
                 continue
             }
 
             //As far as we can tell from here this edge is valid, so let's cross it
-            edge.cross();
+            edge.cross(node);
                 this.solutionNodeList.push(otherNode.ID)
                 length++
                     this.recursiveSolutionFinder(otherNode, goalNode, curDir, length)
                 length--
                 this.solutionNodeList.pop()
-            edge.uncross();
+            edge.uncross(node);
             otherNode.uncross()
             if(num_solutions > 1) return
         }
@@ -325,19 +356,17 @@ class MainScene extends Phaser.Scene {
     resetGrid(){
         this.targetPath = null
         this.nodes.forEach(node => {
-            node.timesCrossed = 0
-            node.numberRestraint = -1
-            node.endPoint = false
+            node.reset();
         })
         this.edges.forEach(edge => {
-            edge.timesCrossed = 0
-            edge.numberRestraint = -1
+            edge.reset();
         })
         this.restraintTexts.forEach(text => {
             //console.log("text")
             text.destroy()
         })
         this.restraintTexts = [];
+        hasOneWayStreets = false;
     }
 
     // Creates the edges and nodes for a grid of the requested size
@@ -410,6 +439,9 @@ class MainScene extends Phaser.Scene {
                     (edge.ScreenLoc())[1], 
                     edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
             }
+            if(edge.oneWayRestraint){
+                //TODO
+            }
         })
     }
     drawNode(node){
@@ -432,23 +464,25 @@ class MainScene extends Phaser.Scene {
         let ALoc = edge.ANode.ScreenLoc();
         let BLoc = edge.BNode.ScreenLoc();
 
+        //First draw the base line
         if(edge.timesCrossed > 0){
             this.graphics.lineStyle(18, 0xFF0000, 1.0);
         } else {
             this.graphics.lineStyle(18, 0xFFFFFF, 1.0);
         }
-
-        //NEWDEBUG
-        // let shade = edge.numberRestraint * 10;
-        // if (shade > 255) shade = 255;
-        // let color = 0x004040 + (shade << 16);
-        // this.graphics.lineStyle(18, color, 1.0);
-        //NEWDEBUG
-
         this.graphics.beginPath();
         this.graphics.moveTo(ALoc[0], ALoc[1]);
         this.graphics.lineTo(BLoc[0], BLoc[1]);
         this.graphics.stroke();
+
+        //If the edge has a one-way restraint, draw that as a little arrow
+        if(edge.oneWayRestraint){
+            this.graphics.lineStyle(2, 0x83BCFF, 1.0);
+            this.graphics.beginPath();
+            this.graphics.moveTo(ALoc[0], ALoc[1]);
+            this.graphics.lineTo(BLoc[0], BLoc[1]);
+            this.graphics.stroke();
+        }
     }
 
     //Prints the grid to console for debug purposes
@@ -459,6 +493,15 @@ class MainScene extends Phaser.Scene {
         //this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
         //console.log(nodeArray)
         //console.log(edgeArray)
+
+        this.edges.forEach(edge => {
+            if(edge.oneWayRestraint){
+                console.log("One way restraint on edge " + edge.ID + 
+                    (edge.canCrossAtoB ? 
+                        " from " + edge.ANode.ID + " to " + edge.BNode.ID : 
+                        " from " + edge.BNode.ID + " to " + edge.ANode.ID))
+            }
+        })
 
         console.log("<Grid>")
         for( var r=0; r<gridHeight; r++) {
@@ -485,9 +528,16 @@ class MainScene extends Phaser.Scene {
                     line += "       ";
                 } else {
                     let e = n.edges[3]; // right
-                    line += "  <";
+
+                    let ch0 = "{";
+                    let ch1 = "}";
+                    if (e.oneWayRestraint) {
+                        if (e.canCrossBtoA) ch0="<"; else ch0="(";
+                        if (e.canCrossAtoB) ch1=">"; else ch1=")";
+                    }       
+                    line += "  "+ch0;
                     if ( e.ID < 10) line += " ";
-                    line = line + e.ID + ">:";
+                    line = line + e.ID + ch1 + ":";
                     if ( e.numberRestraint <  0) line += "##";
                     else {
                         if ( e.numberRestraint < 10) line += " ";
@@ -507,9 +557,16 @@ class MainScene extends Phaser.Scene {
                     line += "      ";
                 } else {
                     let e = n.edges[1]; //bottom
-                    line += "<";  //R
+                    let ch0 = "{";
+                    let ch1 = "}";
+                    if (e.oneWayRestraint) {
+                        if (e.canCrossBtoA) ch0="<"; else ch0="(";
+                        if (e.canCrossAtoB) ch1=">"; else ch1=")";
+                    }       
+
+                    line += ch0;
                     if ( e.ID < 10) line += " ";
-                    line = line + e.ID + ">:";
+                    line = line + e.ID + ch1 + ":";
 
                     if ( e.numberRestraint <  0) line += "##";
                     else {

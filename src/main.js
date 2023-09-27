@@ -73,7 +73,7 @@ const dirNames = ["north", "south", "west", "east"]
 let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR;
 
 let recursionCounter = 0;
-let recursionLimit = 50000;
+let recursionLimit = 30000;
 let recursionLimitReached = false;
 
 //Used to enforce in-range values on the html number fields 

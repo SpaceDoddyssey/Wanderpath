@@ -5,9 +5,18 @@ class Node extends GraphElement {
 
         this.endPoint = false;
         
+        this.elementType = "Node"
+
         this.x = x, this.y = y;
                             
         this.edges = [null, null, null, null];
+    }
+
+    reset(){
+        this.timesCrossed = 0;
+        this.numberRestraint = -1;
+        this.totalRestraints = 0;
+        this.endPoint = false
     }
 
     addRestraints(){

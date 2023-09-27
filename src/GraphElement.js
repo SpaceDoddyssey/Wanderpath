@@ -10,8 +10,11 @@ class GraphElement {
     }
 
     restraintsSatisfied(){
-        //this will get more complex when I add other restraint types
-        return ((this.numberRestraint == -1) || (this.timesCrossed == this.numberRestraint))
+        if ((this.numberRestraint == -1) || (this.timesCrossed == this.numberRestraint)){
+            return true
+        } else {
+            console.log("Node " + this.ID + " restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint)
+        }
     }
 
     uncross(){
@@ -21,7 +24,7 @@ class GraphElement {
     }
 
     cross(){
-        if(!this.canCross) {
+        if(!this.canCross()) {
             return false
         } 
         this.timesCrossed++;
