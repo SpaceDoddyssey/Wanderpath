@@ -13,7 +13,8 @@ class GraphElement {
         if ((this.numberRestraint == -1) || (this.timesCrossed == this.numberRestraint)){
             return true
         } else {
-            console.log("Node " + this.ID + " restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint)
+            if(restraintDebug) { 
+                console.log("Node " + this.ID + " restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint) }
         }
     }
 
@@ -36,8 +37,6 @@ class GraphElement {
             return false
         }
 
-        //cross and cancross are separate because they will probably get more complicated later
-        //and I may want to reference canCross without actually crossing
         if(this.timesCrossed < this.maxCrosses){
             return true
         } else {

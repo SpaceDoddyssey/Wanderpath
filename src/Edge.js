@@ -58,12 +58,13 @@ class Edge extends GraphElement {
 
     restraintsSatisfied(){
         if ((this.numberRestraint != -1) && (this.timesCrossed != this.numberRestraint)){
-            console.log("Edge " + this.ID + " number restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint)
+            if (restraintDebug){ 
+                console.log("Edge " + this.ID + " number restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint) }
             return false;
         }
 
         if (this.oneWayRestraint && this.timesCrossed == 0){
-            console.log("One way not satisfied on edge " + this.ID)
+            if(restraintDebug) { console.log("One way not satisfied on edge " + this.ID); }
             return false;
         }
 
@@ -81,7 +82,7 @@ class Edge extends GraphElement {
         } else if (sourceNode == this.BNode){
             this.numTimesCrossedBtoA++;
         } else {
-            console.log("cross called on edge " + this.id + " with invalid node!");
+            if (edgeCrossDebug) { console.log("cross called on edge " + this.id + " with invalid node!"); }
             return false;
         }
 
@@ -94,7 +95,7 @@ class Edge extends GraphElement {
         } else if (sourceNode == this.BNode){
             this.numTimesCrossedBtoA--;
         } else {
-            console.log("uncross called on edge " + this.id + " with invalid node!");
+            if (edgeCrossDebug) { console.log("uncross called on edge " + this.id + " with invalid node!"); }
             return false;
         }
 
@@ -103,7 +104,6 @@ class Edge extends GraphElement {
 
     canCross(sourceNode){ //Can you cross this edge starting at the given node
         //If the edge is full up to numberRestraint, no
-        //console.log("    edge:cancross: src=" + sourceNode.ID + ", ANode=" + this.ANode.ID + ", BNode=" + this.BNode.ID + ", canAtoB=" + this.canCrossAtoB + ", canBtoA=" + this.canCrossBtoA );
         if (this.numberRestraint != -1 && this.timesCrossed == this.numberRestraint){
             return false
         }
@@ -113,7 +113,7 @@ class Edge extends GraphElement {
         }
         //If the source node is not one of the attached nodes, no, obviously (this should never happen)
         if(sourceNode != this.ANode && sourceNode != this.BNode){
-            console.log("canCross called on edge " + this.id + " with invalid node!")
+            if(edgeCrossDebug) { console.log("canCross called on edge " + this.id + " with invalid node!") }
             return false;
         }
         //If there's a one way restraint and we would be crossing it the wrong way, no
@@ -125,7 +125,7 @@ class Edge extends GraphElement {
             }
         }
         //Otherwise yes
-        //console.log("    edge:cancross: YES");
+        if(edgeCrossDebug) { console.log("    edge:cancross: YES"); }
         return true;
     }
 
@@ -134,5 +134,21 @@ class Edge extends GraphElement {
         if(node == this.BNode) return this.ANode
         console.log("otherNode called with invalid node")
         return
+    }
+
+    drawEdge(graphics){
+        let ALoc = this.ANode.ScreenLoc();
+        let BLoc = this.BNode.ScreenLoc();
+
+        //First draw the base line
+        if(this.timesCrossed > 0){
+            graphics.lineStyle(edgeWidth, 0xFF0000, 1.0);
+        } else {
+            graphics.lineStyle(edgeWidth, 0xFFFFFF, 1.0);
+        }
+        graphics.beginPath();
+        graphics.moveTo(ALoc[0], ALoc[1]);
+        graphics.lineTo(BLoc[0], BLoc[1]);
+        graphics.stroke();
     }
 }

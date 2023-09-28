@@ -31,7 +31,7 @@ class MainScene extends Phaser.Scene {
         this.drawGrid();
     }
     update(){ 
-        //TODO: Not working
+        //TODO: Why is this not working?
         if (Phaser.Input.Keyboard.JustDown(keyR)) { this.regenerateWholeScene; }
     }
 
@@ -60,9 +60,6 @@ class MainScene extends Phaser.Scene {
             //  multiple solutions even with all restraints active
             recursionLimitReached = false;
             recursionCounter = 0;
-            // if(!endNode1 || !endNode2){
-            //     console.log("Endnode broken???")
-            // }
             let solutionsFromEN1 = this.checkSolutions(endNode1, endNode2);
             let solutionsFromEN2 = 0;
             if(hasOneWayStreets){
@@ -198,14 +195,17 @@ class MainScene extends Phaser.Scene {
     }
 
     recursiveSolutionFinder(node, goalNode, lastDir, length){
-        // let indent = "";
-        // for( let i=0; i<length; i++) indent = indent + " ";
-        // console.log( indent + "node " + node.ID + "  " + length )
+        if(recursiveDebugLevel >= 3){
+            let indent = "";
+            for( let i=0; i<length; i++) indent = indent + " ";
+            console.log( indent + "node " + node.ID + "  " + length )
+        }
         recursionCounter += 1;
 
-        let recursiveDebug = true;
-        if(recursiveDebug){
-            console.log(recursionCounter + "  " + this.solutionNodeList);
+        if(recursiveDebugLevel >= 1){
+            if(recursiveDebugLevel >= 2){
+                console.log(recursionCounter + "  " + this.solutionNodeList);
+            }
             if (recursionCounter % 1000 == 0) { 
                 console.log(recursionCounter);
             }
@@ -218,7 +218,7 @@ class MainScene extends Phaser.Scene {
         node.cross();
 
         if(node == goalNode) { 
-            console.log("Reached goal node")
+            if (reachedGoalDebug) { console.log("Reached goal node"); }
             if(this.allRestraintsSatisfied()) {
                 console.log("Found a solution")
                 //console.log(this.solutionNodeList)
@@ -238,20 +238,18 @@ class MainScene extends Phaser.Scene {
 
         //Note: Thought about aborting early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
 
-        //TODO
-        // if(node.numberRestraint != -1 && node.timesCrossed == node.numberRestraint){
-        //     let remainingOutboundCrosses = 0;
-        //     for(let i = 0; i < 4; i++){
-        //         let e = node.edges[i];
-        //         if (e != null && e.numberRestraint != -1){ 
-        //             remainingOutboundCrosses += e.numberRestraint - e.timesCrossed
-        //         }
-        //         if(remainingOutboundCrosses > 1){
-        //             console.log("Too many remaining outbound crosses!")
-        //             return;
-        //         }
-        //     }
-        // }
+        if(node.numberRestraint != -1 && node.timesCrossed == node.numberRestraint){
+            let remainingOutboundCrosses = 0;
+            for(let i = 0; i < 4; i++){
+                let e = node.edges[i];
+                if (e != null && e.numberRestraint != -1){ 
+                    remainingOutboundCrosses += e.numberRestraint - e.timesCrossed
+                }
+                if(remainingOutboundCrosses > 1){
+                    return;
+                }
+            }
+        }
 
         for(let i = 0; i < 4; i++) {
             let curDir = i;
@@ -412,10 +410,10 @@ class MainScene extends Phaser.Scene {
     drawGrid(){
         this.graphics.clear();
         this.edges.forEach(edge => {
-            this.drawEdge(edge);    
+            edge.drawEdge(this.graphics);    
         });
         this.nodes.forEach(node => {
-            this.drawNode(node);
+            node.drawNode(this.graphics);
         });
         this.drawRestraints();
     }
@@ -440,49 +438,56 @@ class MainScene extends Phaser.Scene {
                     edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
             }
             if(edge.oneWayRestraint){
-                //TODO
+                let ANodeLoc = edge.ANode.ScreenLoc();
+                let BNodeLoc = edge.BNode.ScreenLoc();
+                let ALoc = percentBetween(BNodeLoc, ANodeLoc, 0.85);
+                let BLoc = percentBetween(ANodeLoc, BNodeLoc, 0.85);
+                this.graphics.lineStyle(3, 0x83BCFF, 1.0);
+
+                let CLoc = []
+                let DLoc = [];
+                let firstLoc, secondLoc;
+
+                let horizontalOrVertical
+                if(edge.ANode.y == edge.BNode.y){
+                    console.log("horizontal")
+                    horizontalOrVertical = 1
+                } else {
+                    console.log("vertical")
+                    horizontalOrVertical = 0
+                }
+
+                if(edge.canCrossAtoB){
+                    console.log("xxx a-to-b")
+                    firstLoc = ALoc; secondLoc = BLoc;
+                    CLoc[0] = ALoc[0]; 
+                    CLoc[1] = ALoc[1];
+                    DLoc[0] = ALoc[0];
+                    DLoc[1] = ALoc[1];
+                } else {
+                    console.log("xxx a-to-b")
+                    firstLoc = BLoc; secondLoc = ALoc;
+                    CLoc[0] = BLoc[0]; 
+                    CLoc[1] = BLoc[1];
+                    DLoc[0] = BLoc[0];
+                    DLoc[1] = BLoc[1];
+                }
+
+                CLoc[horizontalOrVertical] -= edgeWidth / 5.1
+                DLoc[horizontalOrVertical] += edgeWidth / 5.1
+
+                this.graphics.beginPath();
+                this.graphics.moveTo(firstLoc[0], firstLoc[1]);
+                this.graphics.lineTo(secondLoc[0], secondLoc[1]);
+                this.graphics.stroke();
+                this.graphics.lineTo(CLoc[0], CLoc[1]);
+                this.graphics.stroke();
+                this.graphics.lineTo(DLoc[0], DLoc[1]);
+                this.graphics.stroke();
+                this.graphics.lineTo(secondLoc[0], secondLoc[1]);
+                this.graphics.stroke();
             }
         })
-    }
-    drawNode(node){
-        let color
-        if(node.timesCrossed > 0){
-            color = 0xFF0000
-        } else {
-            color = 0xFFFFFF
-        }
-
-        if(node.endPoint){
-            let loc = node.ScreenLoc();
-            this.graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], 24)  
-        } else {
-            let loc = node.ScreenLoc();
-            this.graphics.fillStyle(color, 1).fillRect(loc[0] - 9, loc[1] - 9, 18, 18)
-        }
-    }
-    drawEdge(edge){
-        let ALoc = edge.ANode.ScreenLoc();
-        let BLoc = edge.BNode.ScreenLoc();
-
-        //First draw the base line
-        if(edge.timesCrossed > 0){
-            this.graphics.lineStyle(18, 0xFF0000, 1.0);
-        } else {
-            this.graphics.lineStyle(18, 0xFFFFFF, 1.0);
-        }
-        this.graphics.beginPath();
-        this.graphics.moveTo(ALoc[0], ALoc[1]);
-        this.graphics.lineTo(BLoc[0], BLoc[1]);
-        this.graphics.stroke();
-
-        //If the edge has a one-way restraint, draw that as a little arrow
-        if(edge.oneWayRestraint){
-            this.graphics.lineStyle(2, 0x83BCFF, 1.0);
-            this.graphics.beginPath();
-            this.graphics.moveTo(ALoc[0], ALoc[1]);
-            this.graphics.lineTo(BLoc[0], BLoc[1]);
-            this.graphics.stroke();
-        }
     }
 
     //Prints the grid to console for debug purposes

@@ -4,6 +4,7 @@
 let UIspacerheight = 64;
 let borderPadding = 32;
 let sizePerUnit = 92;
+let edgeWidth = 18;
 
 let hasOneWayStreets = false; //Future feature
 let num_solutions = 0;
@@ -58,6 +59,20 @@ function newDimensions(newGridWidth, newGridHeight) {
     return [w, h];
 } 
 
+//Returns a point 90% of the way between coord1 and coord2
+//Used only for one-way-streets right now
+function percentBetween(coord1, coord2, proportion){
+    const x1 = coord1[0];
+    const y1 = coord1[1];
+    const x2 = coord2[0];
+    const y2 = coord2[1];
+    
+    const newX = x1 + proportion * (x2 - x1);
+    const newY = y1 + proportion * (y2 - y1);
+    
+    return [newX, newY];
+}
+
 let game = new Phaser.Game(config);
 
 const Dirs = {
@@ -89,3 +104,9 @@ function enforceMinMax(field){
         field.value = field.min;
     }
 }
+
+//Debug flags
+let edgeCrossDebug = false
+let restraintDebug = false
+let reachedGoalDebug = false
+let recursiveDebugLevel = 0

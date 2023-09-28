@@ -12,6 +12,23 @@ class Node extends GraphElement {
         this.edges = [null, null, null, null];
     }
 
+    drawNode(graphics){
+        let color;
+        if(this.timesCrossed > 0){
+            color = 0xFF0000
+        } else {
+            color = 0xFFFFFF
+        }
+
+        if(this.endPoint){
+            let loc = this.ScreenLoc();
+            graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], edgeWidth * 1.333)  
+        } else {
+            let loc = this.ScreenLoc();
+            graphics.fillStyle(color, 1).fillRect(loc[0] - edgeWidth/2, loc[1] - edgeWidth/2, edgeWidth, edgeWidth)
+        }
+    }
+
     reset(){
         this.timesCrossed = 0;
         this.numberRestraint = -1;

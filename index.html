@@ -45,7 +45,7 @@
             // Now call the function to actually create the fields
             createNumberFieldAndLabel("widthField",       "widthField",       "Width",              3,  3, 8);
             createNumberFieldAndLabel("heightField",      "heightField",      "Height",             3,  3, 8);
-            createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, 10, 50);
+            createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, 10, 60);
             createNumberFieldAndLabel("maxCrossingField", "maxCrossingField", "Max Cross Capacity", 4,  1, 5);
         </script>
 
@@ -67,8 +67,10 @@
 
     <!-- Descriptive text -->
     <p class="center-text"><b>Wanderpath</b> is a new kind of puzzle game</p>
-    <p class="center-text"><b>The Goal:</b> Start on one of the large circular nodes and trace a path to the other node.</p>
-    <p class="center-text"><b>The Catch:</b> The path can cross over itself, and each edge or intersection with a number on it must be touched by the path exactly that many times.<br>The path cannot double back.</p>
+    <p class="center-text"><b>The Goal:</b><br></bt></nt>Start on one of the large circular nodes and trace a path to the other node. If there is only one node, trace a path back to the same node you started from</p>
+    <p class="center-text"><b>The Catch:</b><br>The path can cross over itself (but not double back)<br>
+                            A number on an edge or node indicates that the path must touch that edge/node <i>exactly</i> the indicated number of times<br>
+                            A blue arrow on an edge indicates that the edge can only be crossed from the wide end of the arrow to the point
     <p class="center-text">Design and programming by <b>Cameron Dodd</b></p>
 
     <!-- Imports -->
