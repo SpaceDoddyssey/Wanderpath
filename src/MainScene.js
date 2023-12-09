@@ -5,10 +5,10 @@ class MainScene extends Phaser.Scene {
 
     create() {
         this.graphics = this.add.graphics();
-        this.restraintTexts = []
+        this.restraintTexts = [];
 
-        var rnd = Phaser.Math.RND;
-        rnd.init("Seed") //Note: This does not seem to do anything :| I need to figure out how to seed properly
+        rand = Phaser.Math.RND;
+        // rand.init(100);
 
         // define keys     Note: Not currently used
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -31,8 +31,7 @@ class MainScene extends Phaser.Scene {
         this.drawGrid();
     }
     update(){ 
-        //TODO: Why is this not working?
-        if (Phaser.Input.Keyboard.JustDown(keyR)) { this.regenerateWholeScene; }
+        if (Phaser.Input.Keyboard.JustDown(keyR)) { this.regenerateWholeScene(); }
     }
 
 //###################################################################################################################
@@ -50,11 +49,11 @@ class MainScene extends Phaser.Scene {
 
             this.placeRestraints();
 
-            console.log("==== initial restraints placed ====")
-            this.printGrid() //Debug
+            console.log("==== initial restraints placed ====");
+            this.printGrid(); //Debug
 
-            this.nodes.forEach(node => { node.timesCrossed = 0 })
-            this.edges.forEach(edge => { edge.timesCrossed = 0 })
+            this.nodes.forEach(item => { item.timesCrossed = 0 });
+            this.edges.forEach(item => { item.timesCrossed = 0 });
 
             //First we make sure that we haven't ended up with a puzzle where there are 
             //  multiple solutions even with all restraints active
@@ -95,7 +94,7 @@ class MainScene extends Phaser.Scene {
                 this.restraintList.push([element, "OneWay"]);
             }
         })
-        Phaser.Utils.Array.Shuffle(this.restraintList);
+        rand.shuffle(this.restraintList);
 
         //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
         this.restraintList.forEach(restraint => {
@@ -150,11 +149,7 @@ class MainScene extends Phaser.Scene {
             }
         } else {
             //In this case we know there are as many solutions from EN1 as EN2
-            if(solutionsFromEN1 == 1){
-                removedSuccessfuly = true;
-            } else {
-                removedSuccessfuly = false;
-            }
+            removedSuccessfuly = (solutionsFromEN1 == 1);
         }
 
         if(removedSuccessfuly){
@@ -196,8 +191,7 @@ class MainScene extends Phaser.Scene {
 
     recursiveSolutionFinder(node, goalNode, lastDir, length){
         if(recursiveDebugLevel >= 3){
-            let indent = "";
-            for( let i=0; i<length; i++) indent = indent + " ";
+            let indent = " ".repeat(length);
             console.log( indent + "node " + node.ID + "  " + length )
         }
         recursionCounter += 1;
@@ -257,14 +251,13 @@ class MainScene extends Phaser.Scene {
             //console.log("Looking at edge ", curDir)
 
             //If this is the direction we came from, skip
-            let inverseDir = InverseDirs[lastDir];
-            if(curDir == inverseDir) { 
+            if(curDir == InverseDirs[lastDir]) { 
                 //console.log("That's the way we came"); 
                 continue 
             }
 
             //If there's no edge in that direction, skip
-            let edge = node.edges[curDir]
+            let edge = node.edges[curDir];
             if (edge == null) { 
                 //console.log("No edge"); 
                 continue 
@@ -316,10 +309,7 @@ class MainScene extends Phaser.Scene {
     //This function is called when the user clicks the Regenerate Game button on the left side of the page
     regenerateWholeScene(){
         //Get the new parameters
-        let newGW = widthField.value
-        let newGH = heightField.value
-        let newML = lengthField.value
-        let newMC = maxCrossField.value
+        let [newGW, newGH, newML, newMC] = [widthField.value, heightField.value, lengthField.value, maxCrossField.value];
         
         //Check that the parameters are valid, display error message if necessary
         //The maximum path length is (width * height - 1) * maxCrossings
@@ -332,10 +322,7 @@ class MainScene extends Phaser.Scene {
             errorMessage.innerHTML = ""
         }
 
-        gridWidth  = newGW;
-        gridHeight = newGH;
-        maxLength  = newML;
-        maxCrosses = newMC;
+        [gridWidth, gridHeight, maxLength, maxCrosses] = [newGW, newGH, newML, newMC];
 
         // errorMessage.innerHTML = "<b>&nbspGenerating...&nbsp</b>"
 
@@ -381,15 +368,14 @@ class MainScene extends Phaser.Scene {
         counter = 0
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
+                let from = this.nodes[ (width * y) + x ]
                 //Connect to the node to the right
                 if(x != width - 1){
-                    let from = this.nodes[ (width * y) + x ]
                     let to   = this.nodes[ (width * y) + x + 1]
                     this.edges.push(from.connectEdge(to, Dirs.Right, counter++))
                 }
                 //Connect to the node below
                 if(y != height - 1){
-                    let from = this.nodes[ (width * y) + x ]
                     let to   = this.nodes[ (width * (y + 1)) + x ]
                     this.edges.push(from.connectEdge(to, Dirs.Down, counter++))
                 }
@@ -438,53 +424,31 @@ class MainScene extends Phaser.Scene {
                     edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
             }
             if(edge.oneWayRestraint){
-                let ANodeLoc = edge.ANode.ScreenLoc();
-                let BNodeLoc = edge.BNode.ScreenLoc();
-                let ALoc = percentBetween(BNodeLoc, ANodeLoc, 0.85);
-                let BLoc = percentBetween(ANodeLoc, BNodeLoc, 0.85);
+                let [ANodeLoc, BNodeLoc] = [edge.ANode.ScreenLoc(), edge.BNode.ScreenLoc()];
+                let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.85), percentBetween(ANodeLoc, BNodeLoc, 0.85)];
                 this.graphics.lineStyle(3, 0x83BCFF, 1.0);
 
-                let CLoc = []
-                let DLoc = [];
+                let [CLoc, DLoc] = [[], []];
                 let firstLoc, secondLoc;
 
                 let horizontalOrVertical
                 if(edge.ANode.y == edge.BNode.y){
-                    console.log("horizontal")
                     horizontalOrVertical = 1
                 } else {
-                    console.log("vertical")
                     horizontalOrVertical = 0
                 }
 
-                if(edge.canCrossAtoB){
-                    console.log("xxx a-to-b")
-                    firstLoc = ALoc; secondLoc = BLoc;
-                    CLoc[0] = ALoc[0]; 
-                    CLoc[1] = ALoc[1];
-                    DLoc[0] = ALoc[0];
-                    DLoc[1] = ALoc[1];
-                } else {
-                    console.log("xxx a-to-b")
-                    firstLoc = BLoc; secondLoc = ALoc;
-                    CLoc[0] = BLoc[0]; 
-                    CLoc[1] = BLoc[1];
-                    DLoc[0] = BLoc[0];
-                    DLoc[1] = BLoc[1];
-                }
-
-                CLoc[horizontalOrVertical] -= edgeWidth / 5.1
-                DLoc[horizontalOrVertical] += edgeWidth / 5.1
-
+                [firstLoc, secondLoc] = edge.canCrossAtoB ? [ALoc, BLoc] : [BLoc, ALoc];
+                [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = edge.canCrossAtoB ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];
+                CLoc[horizontalOrVertical] -= edgeWidth / 5.1;
+                DLoc[horizontalOrVertical] += edgeWidth / 5.1;
+                
                 this.graphics.beginPath();
-                this.graphics.moveTo(firstLoc[0], firstLoc[1]);
-                this.graphics.lineTo(secondLoc[0], secondLoc[1]);
-                this.graphics.stroke();
-                this.graphics.lineTo(CLoc[0], CLoc[1]);
-                this.graphics.stroke();
-                this.graphics.lineTo(DLoc[0], DLoc[1]);
-                this.graphics.stroke();
-                this.graphics.lineTo(secondLoc[0], secondLoc[1]);
+                this.graphics.moveTo(...firstLoc);
+                this.graphics.lineTo(...secondLoc);
+                this.graphics.lineTo(...CLoc);
+                this.graphics.lineTo(...DLoc);
+                this.graphics.lineTo(...secondLoc);
                 this.graphics.stroke();
             }
         })
@@ -508,6 +472,7 @@ class MainScene extends Phaser.Scene {
             }
         })
 
+        //Debug - written by Brian Dodd while helping to debug something tough
         console.log("<Grid>")
         for( var r=0; r<gridHeight; r++) {
             let line = " ";

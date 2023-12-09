@@ -22,7 +22,7 @@ class Path {
             this.nodeList = [];
     
             invalid = false
-            let curNode = Phaser.Utils.Array.GetRandom(nodes, 0, nodes.length);
+            let curNode = Phaser.Math.RND.pick(nodes);
             //console.log("Selected starting node ", curNode.x, ", ", curNode.y)
 
             curNode.endPoint = true;
@@ -43,13 +43,8 @@ class Path {
                 invalid = true
             }
         }
-
-        let edgeArray = []
-        this.edgeList.forEach(edge => { edgeArray.push(edge.ID) })
-        console.log("Path finished: EDGES: " + edgeArray)
-        let nodeArray = []
-        this.nodeList.forEach(node => { nodeArray.push(node.ID) })
-        console.log("Path finished: NODES: " + nodeArray)
+        console.log("Path finished: EDGES: " + this.edgeList.map(edge => edge.ID));
+        console.log("Path finished: NODES: " + this.nodeList.map(node => node.ID));
         return true;
     }
     
@@ -57,7 +52,7 @@ class Path {
     recursivePath(node){
         //Iterate through the directions randomly
         let validDirs = [... this.allDirs]
-        Phaser.Utils.Array.Shuffle(validDirs);
+        rand.shuffle(validDirs);
 
         //Check each edge 
         let selectedEdge = null;
@@ -100,11 +95,8 @@ class Path {
             } 
     
             //We still have edges to go, so keep looking
-            let goesTheDistance = this.recursivePath(otherNode) 
-            //If goesTheDistance is false, only leads to a dead end 
-            if(goesTheDistance){
-                return true 
-            } else {
+            let leadsToDeadEnd = !this.recursivePath(otherNode); 
+            if(leadsToDeadEnd){
                 selectedEdge.uncross(node)
                 otherNode.uncross()
                 this.dirsTravelled.pop()
@@ -112,15 +104,12 @@ class Path {
                 this.edgeList.pop()
                 this.nodeList.pop()
                 continue
+            } else {
+                return true
             }
         }
 
         //If we're at this point either we've finished or we've hit a dead end and need to backtrack
-        if(selectedEdge == null) {
-            //console.log("Dead end")
-            return false
-        } else {
-            return true
-        }
+        return (selectedEdge != null)      
     }
 }

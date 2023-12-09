@@ -2,8 +2,7 @@ class Edge extends GraphElement {
     constructor(ANode, BNode, id) {
         super(id);
         
-        this.ANode = ANode;
-        this.BNode = BNode;
+        [this.ANode, this.BNode] = [ANode, BNode];
         
         this.elementType = "Edge"
 
@@ -34,26 +33,16 @@ class Edge extends GraphElement {
     }
 
     addRestraints(){
-        //This will be more complicated once other types of restraints are added
         if(this.numberRestraint == -1){
             this.numberRestraint = this.timesCrossed;
             this.totalRestraints++;
         }
 
-        this.canCrossAtoB = true;
-        this.canCrossBtoA = true;
-        if((this.numTimesCrossedAtoB == 0) && (this.numTimesCrossedBtoA != 0)){ 
-            this.canCrossAtoB = false; 
-            this.oneWayRestraint = true;
-            hasOneWayStreets = true;
-            this.totalRestraints++;
-        } else 
-        if ((this.numTimesCrossedAtoB != 0) && (this.numTimesCrossedBtoA == 0)){
-            this.canCrossBtoA = false;
-            this.oneWayRestraint = true;
-            hasOneWayStreets = true;
-            this.totalRestraints++;
-        }
+        this.canCrossAtoB = !(this.numTimesCrossedAtoB == 0 && this.numTimesCrossedBtoA != 0);
+        this.canCrossBtoA = !(this.numTimesCrossedAtoB != 0 && this.numTimesCrossedBtoA == 0);
+        this.oneWayRestraint = !this.canCrossAtoB || !this.canCrossBtoA;
+        hasOneWayStreets = true;
+        this.totalRestraints++;
     }
 
     restraintsSatisfied(){
@@ -137,18 +126,15 @@ class Edge extends GraphElement {
     }
 
     drawEdge(graphics){
-        let ALoc = this.ANode.ScreenLoc();
-        let BLoc = this.BNode.ScreenLoc();
+        let [ALoc, BLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
 
         //First draw the base line
-        if(this.timesCrossed > 0){
-            graphics.lineStyle(edgeWidth, 0xFF0000, 1.0);
-        } else {
-            graphics.lineStyle(edgeWidth, 0xFFFFFF, 1.0);
-        }
+        let color = this.timesCrossed > 0 ? 0xFF0000 : 0xFFFFFF;
+        graphics.lineStyle(edgeWidth, color, 1.0);
+        
         graphics.beginPath();
-        graphics.moveTo(ALoc[0], ALoc[1]);
-        graphics.lineTo(BLoc[0], BLoc[1]);
+        graphics.moveTo(...ALoc);
+        graphics.lineTo(...BLoc);
         graphics.stroke();
     }
 }

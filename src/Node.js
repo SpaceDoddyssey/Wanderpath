@@ -7,24 +7,18 @@ class Node extends GraphElement {
         
         this.elementType = "Node"
 
-        this.x = x, this.y = y;
+        [this.x, this.y] = [x, y];
                             
         this.edges = [null, null, null, null];
     }
 
     drawNode(graphics){
-        let color;
-        if(this.timesCrossed > 0){
-            color = 0xFF0000
-        } else {
-            color = 0xFFFFFF
-        }
+        let color = this.timesCrossed > 0 ? 0xFF0000 : 0xFFFFFF;
 
+        let loc = this.ScreenLoc();
         if(this.endPoint){
-            let loc = this.ScreenLoc();
             graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], edgeWidth * 1.333)  
         } else {
-            let loc = this.ScreenLoc();
             graphics.fillStyle(color, 1).fillRect(loc[0] - edgeWidth/2, loc[1] - edgeWidth/2, edgeWidth, edgeWidth)
         }
     }
@@ -37,7 +31,6 @@ class Node extends GraphElement {
     }
 
     addRestraints(){
-        //This will be more complicated once other types of restraints are added
         if(this.numberRestraint == -1){
             this.numberRestraint = this.timesCrossed;
             this.totalRestraints++;

@@ -10,11 +10,13 @@ let hasOneWayStreets = false; //Future feature
 let num_solutions = 0;
 let endNode1, endNode2
 
+let rand;
+
 //Get references to the value fields
-let widthField    = document.getElementById('widthField')
-let heightField   = document.getElementById('heightField')
-let lengthField   = document.getElementById('lengthField')
-let maxCrossField = document.getElementById('maxCrossingField')
+let widthField    = document.querySelector('#widthField')
+let heightField   = document.querySelector('#heightField')
+let lengthField   = document.querySelector('#lengthField')
+let maxCrossField = document.querySelector('#maxCrossingField')
 
 //Get the values
 let gridWidth  = widthField.value
@@ -62,10 +64,8 @@ function newDimensions(newGridWidth, newGridHeight) {
 //Returns a point 90% of the way between coord1 and coord2
 //Used only for one-way-streets right now
 function percentBetween(coord1, coord2, proportion){
-    const x1 = coord1[0];
-    const y1 = coord1[1];
-    const x2 = coord2[0];
-    const y2 = coord2[1];
+    const [x1, y1] = coord1;
+    const [x2, y2] = coord2;
     
     const newX = x1 + proportion * (x2 - x1);
     const newY = y1 + proportion * (y2 - y1);

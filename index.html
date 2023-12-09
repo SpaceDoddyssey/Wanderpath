@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,7 +31,6 @@
     <div id="numFieldCol" class="column num-field-col" style="grid-area:col1">
         <!-- First we create the parameter fields and associated labels -->
         <script>
-            // First define a function to reduce code duplication
             function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
                 const div = document.createElement("div");
                 div.classList.add("flex-row");
@@ -42,7 +41,6 @@
                 document.getElementById("numFieldCol").appendChild(div);
             }
 
-            // Now call the function to actually create the fields
             createNumberFieldAndLabel("widthField",       "widthField",       "Width",              3,  3, 8);
             createNumberFieldAndLabel("heightField",      "heightField",      "Height",             3,  3, 8);
             createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, 10, 60);
