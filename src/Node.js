@@ -7,7 +7,7 @@ class Node extends GraphElement {
         
         this.elementType = "Node"
 
-        [this.x, this.y] = [x, y];
+        this.x = x, this.y = y;
                             
         this.edges = [null, null, null, null];
     }
