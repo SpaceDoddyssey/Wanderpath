@@ -7,8 +7,13 @@ class MainScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
         this.restraintTexts = [];
 
-        rand = Phaser.Math.RND;
-        // rand.init(100);
+        initRNG();
+        document.querySelector('#seedButton').addEventListener('click', () => {
+            if (parseSeedString()){
+                console.log("Parsed: ", getCurParameters());
+                this.regenerateWholeScene();
+            }
+        });
 
         // define keys     Note: Not currently used
         keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -21,7 +26,7 @@ class MainScene extends Phaser.Scene {
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
         //Hook up the button that regenerates the whole game with new given parameters
-        document.getElementById('regenerateGridButton').onclick = this.regenerateWholeScene.bind(this);
+        document.querySelector('#regenerateGridButton').onclick = this.initRandAndGenerate.bind(this);
 
         //Create the elements of the base grid
         this.populateGrid(gridWidth, gridHeight);
@@ -31,12 +36,20 @@ class MainScene extends Phaser.Scene {
         this.drawGrid();
     }
     update(){ 
-        if (Phaser.Input.Keyboard.JustDown(keyR)) { this.regenerateWholeScene(); }
+        if (Phaser.Input.Keyboard.JustDown(keyR)) { 
+            initRNG();
+            this.regenerateWholeScene(); 
+        }
     }
 
 //###################################################################################################################
 //############################################## GENERATING THE PUZZLE ##############################################    
 //###################################################################################################################
+
+    initRandAndGenerate(){
+        initRNG();
+        this.regenerateWholeScene(); 
+    }
 
     generatePuzzle(width, height){
         let validPuzzle = false;
@@ -73,7 +86,7 @@ class MainScene extends Phaser.Scene {
                 console.log("*** Puzzle not valid!  attempts = " + attempts );
 
                 if(attempts > 500){
-                    let errorMessage = document.getElementById("HtmlErrorLabel");
+                    let errorMessage = document.querySelector("#HtmlErrorLabel");
                     errorMessage.innerHTML = "&nbspFailed to generate valid puzzle&nbsp"
                     return;
                 }
@@ -308,21 +321,10 @@ class MainScene extends Phaser.Scene {
 
     //This function is called when the user clicks the Regenerate Game button on the left side of the page
     regenerateWholeScene(){
-        //Get the new parameters
-        let [newGW, newGH, newML, newMC] = [widthField.value, heightField.value, lengthField.value, maxCrossField.value];
-        
-        //Check that the parameters are valid, display error message if necessary
-        //The maximum path length is (width * height - 1) * maxCrossings
-        let errorMessage = document.getElementById("HtmlErrorLabel");
+        let newParams = getCurParameters();
+        if(newParams == null){ return; }
 
-        if(newML > (newGW * newGH - 1) * newMC){ 
-            errorMessage.innerHTML = "<b>&nbspInvalid settings!</b><br>&nbspPath Length must be at most&nbsp<br>&nbsp(Width * Height - 1) * Max Crosses&nbsp"
-            return;
-        } else {
-            errorMessage.innerHTML = ""
-        }
-
-        [gridWidth, gridHeight, maxLength, maxCrosses] = [newGW, newGH, newML, newMC];
+        [gridWidth, gridHeight, maxLength, maxCrosses] = newParams;
 
         // errorMessage.innerHTML = "<b>&nbspGenerating...&nbsp</b>"
 
@@ -332,12 +334,10 @@ class MainScene extends Phaser.Scene {
         this.resetGrid();
         this.populateGrid(gridWidth, gridHeight);
         this.generatePuzzle(gridWidth, gridHeight);
-        
-        // errorMessage.innerHTML = ""
 
         this.drawGrid();
     }
-    
+
     resetGrid(){
         this.targetPath = null
         this.nodes.forEach(node => {

@@ -23,6 +23,11 @@
         .center-text {
             text-align: center;
         }
+        .seed-text {
+            resize: none; 
+            width: 192px; 
+            height: 18px; 
+        }
     </style>
 </head>
 
@@ -41,10 +46,14 @@
                 document.getElementById("numFieldCol").appendChild(div);
             }
 
-            createNumberFieldAndLabel("widthField",       "widthField",       "Width",              3,  3, 8);
-            createNumberFieldAndLabel("heightField",      "heightField",      "Height",             3,  3, 8);
-            createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, 10, 60);
-            createNumberFieldAndLabel("maxCrossingField", "maxCrossingField", "Max Cross Capacity", 4,  1, 5);
+            const heightRange = [3, 8];
+            const widthRange = [3, 8];
+            const lengthRange = [12, 60];
+            const maxCrossRange = [1, 5];
+            createNumberFieldAndLabel("widthField",       "widthField",       "Width",              3,  widthRange[0],    widthRange[1]);
+            createNumberFieldAndLabel("heightField",      "heightField",      "Height",             3,  heightRange[0],   heightRange[1]);
+            createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, lengthRange[0],   lengthRange[1]);
+            createNumberFieldAndLabel("maxCrossingField", "maxCrossingField", "Max Cross Capacity", 4,  maxCrossRange[0], maxCrossRange[1]);
         </script>
 
         <!-- Button to regenerate the grid -->
@@ -54,6 +63,11 @@
 
         <!-- Spot for a warning label if you entered invalid parameters -->
         <label id="HtmlErrorLabel" style="background-color:#ff0404;"> </label>
+
+        <br><br><br>
+        Seed:
+        <textArea id="seedTextArea" class="seed-text" placeholder="Seed"></textArea>
+        <button type="button" id="seedButton" style="width: 120px">Load From Seed</button>
     </div>
     
     <!-- Game div -->
