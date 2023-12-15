@@ -60,35 +60,25 @@ class Edge extends GraphElement {
         return true;
     }
 
-    cross(sourceNode){
-        if(!this.canCross(sourceNode)) {
-            return false
-        } 
-
-        this.timesCrossed++;
-        if(sourceNode == this.ANode){
-            this.numTimesCrossedAtoB++;
-        } else if (sourceNode == this.BNode){
-            this.numTimesCrossedBtoA++;
-        } else {
-            if (edgeCrossDebug) { console.log("cross called on edge " + this.id + " with invalid node!"); }
+    cross(sourceNode) {
+        if (!this.canCross(sourceNode) || ![this.ANode, this.BNode].includes(sourceNode)) {
+            if (edgeCrossDebug) console.log(`cross called on edge ${this.id} with invalid node!`);
             return false;
         }
-
+    
+        this.timesCrossed++;
+        sourceNode == this.ANode ? this.numTimesCrossedAtoB++ : this.numTimesCrossedBtoA++;
         return true;
     }
-
-    uncross(sourceNode){
-        if(sourceNode == this.ANode){
-            this.numTimesCrossedAtoB--;
-        } else if (sourceNode == this.BNode){
-            this.numTimesCrossedBtoA--;
-        } else {
-            if (edgeCrossDebug) { console.log("uncross called on edge " + this.id + " with invalid node!"); }
+    
+    uncross(sourceNode) {
+        if (![this.ANode, this.BNode].includes(sourceNode)) {
+            if (edgeCrossDebug) console.log(`uncross called on edge ${this.id} with invalid node!`);
             return false;
         }
-
+    
         this.timesCrossed--;
+        sourceNode == this.ANode ? this.numTimesCrossedAtoB-- : this.numTimesCrossedBtoA--;
     }
 
     canCross(sourceNode){ //Can you cross this edge starting at the given node
@@ -125,7 +115,7 @@ class Edge extends GraphElement {
         return
     }
 
-    drawEdge(graphics){
+    draw(graphics){
         let [ALoc, BLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
 
         //First draw the base line

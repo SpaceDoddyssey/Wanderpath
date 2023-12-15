@@ -16,11 +16,8 @@ class MainScene extends Phaser.Scene {
         });
 
         // define keys     Note: Not currently used
-        keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        [keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR] = 
+        ['UP', 'DOWN', 'LEFT', 'RIGHT', 'R'].map(dir => this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[dir]));
         
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
@@ -95,8 +92,7 @@ class MainScene extends Phaser.Scene {
             }
         }
 
-        this.printGrid() //Debug
-
+        //Now we have a valid path, so we can start removing restraints
         this.restraintList = [];
         this.allElements.forEach(element => {
             if(element.numberRestraint != -1){
@@ -116,7 +112,7 @@ class MainScene extends Phaser.Scene {
         
         console.log("----------------- \nAll Restraints removed. \n-----------------")
 
-        this.printGrid() //Debug
+        // this.printGrid() //Debug
         this.drawGrid()
     }
 
@@ -134,7 +130,7 @@ class MainScene extends Phaser.Scene {
             //Save and remove the restraint on the element
             element.numberRestraint = -1;
 
-            this.printGrid() //Debug
+            // this.printGrid() //Debug
         } else if (typeToRemove == "OneWay"){
             element.oneWayRestraint = false;
 
@@ -154,11 +150,9 @@ class MainScene extends Phaser.Scene {
             } else {
                 let solutionsFromEN2 = this.checkSolutions(endNode2, endNode1);
                 //If there is either 1 solution from EN2, or no solutions from EN2 but 1 solutions from EN1, success 
-                if(solutionsFromEN2 == 1 || (solutionsFromEN1 == 1 && solutionsFromEN2 == 0)){
-                    removedSuccessfuly = true;
-                } else {
-                    removedSuccessfuly = false
-                }
+                removedSuccessfuly = 
+                    (solutionsFromEN2 == 1 || (solutionsFromEN1 == 1 && solutionsFromEN2 == 0)
+                    ? true : false);
             }
         } else {
             //In this case we know there are as many solutions from EN1 as EN2
@@ -381,7 +375,7 @@ class MainScene extends Phaser.Scene {
                 }
             }
         }
-        this.allElements = this.nodes.concat(this.edges);
+        this.allElements = [...this.nodes, ...this.edges];
     }
     placeRestraints(){   
         this.allElements.forEach(element => {
@@ -395,11 +389,8 @@ class MainScene extends Phaser.Scene {
 
     drawGrid(){
         this.graphics.clear();
-        this.edges.forEach(edge => {
-            edge.drawEdge(this.graphics);    
-        });
-        this.nodes.forEach(node => {
-            node.drawNode(this.graphics);
+        [...this.edges, ...this.nodes].forEach(element => {
+            element.draw(this.graphics);
         });
         this.drawRestraints();
     }
@@ -431,12 +422,7 @@ class MainScene extends Phaser.Scene {
                 let [CLoc, DLoc] = [[], []];
                 let firstLoc, secondLoc;
 
-                let horizontalOrVertical
-                if(edge.ANode.y == edge.BNode.y){
-                    horizontalOrVertical = 1
-                } else {
-                    horizontalOrVertical = 0
-                }
+                let horizontalOrVertical = edge.ANode.y == edge.BNode.y ? 1 : 0;
 
                 [firstLoc, secondLoc] = edge.canCrossAtoB ? [ALoc, BLoc] : [BLoc, ALoc];
                 [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = edge.canCrossAtoB ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];

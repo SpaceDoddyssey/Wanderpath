@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+body {
+    font-family: 'Open Sans', Regular;
+    background-color: #83BCFF;
+    grid-template:
+        "col1 col2 col3" 1fr
+        / 33.33vw 33.33vw 33.33vw;
+}
+.num-field-col {
+    position: absolute;
+    display: flex;
+    flex-direction: column; 
+    padding-top: 10px;
+}
+.center-text {
+    text-align: center;
+}
+.seed-text {
+    resize: none; 
+    width: 192px; 
+    height: 18px; 
+}   

@@ -28,7 +28,7 @@ let maxCrosses = maxCrossField.value //Max times a node or edge can be crossed
 function initRNG(){ 
     rand = Phaser.Math.RND;
     let stateInit = rand.state();
-    rand.sow(stateInit + Date.now());   //First seed with the date to make sure we get a different seed every time
+    rand.sow(stateInit + Date.now()); //First seed with the date to make sure we get a random seed when we refresh the page
     curSeed = rand.integerInRange(0, Number.MAX_SAFE_INTEGER);
     rand.sow(curSeed.toString());
     let seedString = createSeedString();
@@ -43,7 +43,6 @@ function createSeedString() {
 document.querySelector('#seedButton').addEventListener('click', () => {
     parseSeedString();
 });
-
 function parseSeedString() {
     const seedString = document.querySelector('#seedTextArea').value;
     console.log("Loading seed:", seedString);
@@ -74,10 +73,11 @@ function getCurParameters(){
         return null;
     }
 
-    if(newGW < widthRange[0] || newGW > widthRange[1]
-    || newGH < heightRange[0] || newGH > heightRange[1]
-    || newML < lengthRange[0] || newML > lengthRange[1]
-    || newMC < maxCrossRange[0] || newMC > maxCrossRange[1]){
+    let widthNotInRange    = newGW < widthRange[0] || newGW > widthRange[1];
+    let heightNotInRange   = newGH < heightRange[0] || newGH > heightRange[1];
+    let lengthNotInRange   = newML < lengthRange[0] || newML > lengthRange[1];
+    let maxCrossNotInRange = newMC < maxCrossRange[0] || newMC > maxCrossRange[1];
+    if(widthNotInRange || heightNotInRange || lengthNotInRange || maxCrossNotInRange){
         errorMessage.innerHTML = "<b>&nbspInvalid settings!<br>Values out of range&nbsp"
         return null;
     }
@@ -87,6 +87,12 @@ function getCurParameters(){
 }
 
 let defaultDimensions = newDimensions(gridWidth, gridHeight)
+
+function newDimensions(newGridWidth, newGridHeight) {
+    let w = (newGridWidth * sizePerUnit) + borderPadding * 2;
+    let h = (newGridHeight * sizePerUnit) + borderPadding * 2;
+    return [w, h];
+} 
 
 let config = {
     type: Phaser.CANVAS,
@@ -116,12 +122,6 @@ let restraintConfig = {
     color: '#ff0404',
     align: 'center'
 }
-
-function newDimensions(newGridWidth, newGridHeight) {
-    let w = (newGridWidth * sizePerUnit) + borderPadding * 2;
-    let h = (newGridHeight * sizePerUnit) + borderPadding * 2;
-    return [w, h];
-} 
 
 //Returns a point 90% of the way between coord1 and coord2
 //Used only for one-way-streets right now
@@ -166,6 +166,8 @@ function enforceMinMax(field){
         field.value = field.min;
     }
 }
+
+
 
 //Debug flags
 let edgeCrossDebug = false

@@ -12,7 +12,7 @@ class Node extends GraphElement {
         this.edges = [null, null, null, null];
     }
 
-    drawNode(graphics){
+    draw(graphics){
         let color = this.timesCrossed > 0 ? 0xFF0000 : 0xFFFFFF;
 
         let loc = this.ScreenLoc();
