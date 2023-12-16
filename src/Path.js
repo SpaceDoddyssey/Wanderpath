@@ -58,9 +58,7 @@ class Path {
         let selectedEdge = null;
         for(let i = 0; i < 4; i++) {
             let curDir = validDirs[i];
-
-            //console.log("Looking at edge ", curDir)
-
+            
             //If we've already found an edge, or this is the direction we came from, skip
             if(selectedEdge) continue
             let inverseDir = InverseDirs[this.dirsTravelled[this.dirsTravelled.length-1]];
@@ -95,18 +93,18 @@ class Path {
             } 
     
             //We still have edges to go, so keep looking
-            let leadsToDeadEnd = !this.recursivePath(otherNode); 
-            if(leadsToDeadEnd){
-                selectedEdge.uncross(node)
-                otherNode.uncross()
-                this.dirsTravelled.pop()
-                selectedEdge = null
-                this.edgeList.pop()
-                this.nodeList.pop()
-                continue
-            } else {
+            let doesNotLeadToDeadEnd = this.recursivePath(otherNode); 
+            if (doesNotLeadToDeadEnd) {
                 return true
             }
+            
+            selectedEdge.uncross(node)
+            otherNode.uncross()
+            this.dirsTravelled.pop()
+            selectedEdge = null
+            this.edgeList.pop()
+            this.nodeList.pop()
+            continue
         }
 
         //If we're at this point either we've finished or we've hit a dead end and need to backtrack

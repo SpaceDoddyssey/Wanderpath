@@ -8,7 +8,7 @@ let edgeWidth = 18;
 
 let hasOneWayStreets = false; //Future feature
 let num_solutions = 0;
-let endNode1, endNode2
+let endNode1, endNode2;
 
 let rand;
 let curSeed;
@@ -135,6 +135,7 @@ function percentBetween(coord1, coord2, proportion){
     return [newX, newY];
 }
 
+let graphics; 
 let game = new Phaser.Game(config);
 
 const Dirs = {
