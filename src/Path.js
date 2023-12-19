@@ -43,8 +43,10 @@ class Path {
                 invalid = true
             }
         }
-        console.log("Path finished: EDGES: " + this.edgeList.map(edge => edge.ID));
-        console.log("Path finished: NODES: " + this.nodeList.map(node => node.ID));
+        if(finalPathDebug){
+            console.log("Path finished: EDGES: " + this.edgeList.map(edge => edge.ID));
+            console.log("Path finished: NODES: " + this.nodeList.map(node => node.ID));
+        }
         return true;
     }
     
