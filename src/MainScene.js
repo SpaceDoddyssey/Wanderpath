@@ -13,10 +13,13 @@ class MainScene extends Phaser.Scene {
             }
         });
 
-        // define keys     Note: Not currently used
-        [keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR] = 
-        ['UP', 'DOWN', 'LEFT', 'RIGHT', 'R'].map(dir => this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[dir]));
-        
+        // define keys 
+        keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+        keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
@@ -27,6 +30,7 @@ class MainScene extends Phaser.Scene {
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight, this);
         //Generate a puzzle within the grid
         this.puzzle.generatePuzzle(gridWidth, gridHeight);
+        setSeedText();
 
         this.puzzle.drawGrid();
     }
@@ -36,11 +40,25 @@ class MainScene extends Phaser.Scene {
             initRNG();
             this.regenerateWholeScene(); 
         }
+
+        if(Phaser.Input.Keyboard.JustDown(keyUP)){
+            this.puzzle.movePlayer(Dirs.Up);
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
+            this.puzzle.movePlayer(Dirs.Down);
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyLEFT)){
+            this.puzzle.movePlayer(Dirs.Left);
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
+            this.puzzle.movePlayer(Dirs.Right);
+        }
     }
 
     initRandAndGenerate(){
         initRNG();
         this.regenerateWholeScene(); 
+        setSeedText();
     }
 
     //This function is called when the user clicks the Regenerate Game button on the left side of the page

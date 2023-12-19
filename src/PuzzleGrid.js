@@ -6,8 +6,18 @@ class PuzzleGrid {
         this.restraintTexts = [];
 
         this.populateGrid(gridWidth, gridHeight);
+
+        this.playerNode = this.nodes[0];
     }
     
+    movePlayer(direction){
+        let edge = this.playerNode.edges[direction];
+        if(edge != null && edge.canCross(this.playerNode)){
+            this.playerNode = edge.otherNode(this.playerNode);
+        }
+        console.log("Player moved to node " + this.playerNode.ID);
+    }
+
     populateGrid(width, height){
         this.nodes = []
         this.edges = []
@@ -38,6 +48,11 @@ class PuzzleGrid {
     }
 
     resetAndRegenerate(){
+        this.nodes = [];
+        this.edges = [];
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.populateGrid(gridWidth, gridHeight);
         this.resetGrid();
         this.generatePuzzle(this.gridWidth, this.gridHeight);
         this.drawGrid();
@@ -61,16 +76,16 @@ class PuzzleGrid {
     generatePuzzle(width, height){
         let validPuzzle = false;
         let attempts = 0;
-        console.clear();
         //First generate a valid path
         while(!validPuzzle){
+            // console  .clear();
             this.targetPath = new Path()
             this.targetPath.generate(this.nodes, maxLength)
 
             this.placeRestraints();
 
-            console.log("==== initial restraints placed ====");
-            this.printGrid(); //Debug
+            if (restraintDebug) console.log("==== initial restraints placed ====");
+            // this.printGrid(); //Debug
 
             this.nodes.forEach(item => { item.timesCrossed = 0 });
             this.edges.forEach(item => { item.timesCrossed = 0 });
@@ -89,8 +104,7 @@ class PuzzleGrid {
                         || (solutionsFromEN2 == 1 && solutionsFromEN1 < 2))
             if(!validPuzzle){
                 attempts += 1;
-                console.log("  ");
-                console.log("*** Puzzle not valid!  attempts = " + attempts );
+                console.log("Failed to generate puzzle. Trying again. Attempts = " + attempts );
 
                 if(attempts > 500){
                     let errorMessage = document.querySelector("#HtmlErrorLabel");
@@ -120,7 +134,7 @@ class PuzzleGrid {
             this.tryRemoveRestraint(restraint[0], restraint[1]);    
         })
         
-        console.log("----------------- \nAll Restraints removed. \n-----------------")
+        if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
 
         // this.printGrid() //Debug
         this.drawGrid()
@@ -156,7 +170,7 @@ class PuzzleGrid {
         num_solutions = 0;
         recursionCounter = 0;
         this.recursiveSolutionFinder(startNode, targetNode, Dirs.Endpoint, 0);
-        console.log("Found " + num_solutions + " solutions from node " + startNode.ID)
+        if (foundSolutionDebug) console.log("Found " + num_solutions + " solutions from node " + startNode.ID)
         startNode.uncross();
         targetNode.uncross();
         if(recursionLimitReached) {
@@ -192,7 +206,7 @@ class PuzzleGrid {
         if(node == goalNode) { 
             if (reachedGoalDebug) { console.log("Reached goal node"); }
             if(this.allRestraintsSatisfied()) {
-                console.log("Found a solution")
+                if (foundSolutionDebug) console.log("Found a solution")
                 //console.log(this.solutionNodeList)
                 if(length != maxLength){
                     //We've just found a solution that is not the same length as the intended solution
@@ -202,8 +216,6 @@ class PuzzleGrid {
                 }
                 num_solutions += 1;
                 return
-            } else {
-                //console.log("Touched the end - restraints not satisfied, continuing")
             }
         }
         //Past this point we know we are not already on a solution, so we need to keep looking
@@ -267,11 +279,13 @@ class PuzzleGrid {
     }
 
     tryRemoveRestraint(element, typeToRemove){
-        console.log("xxxx " + element + typeToRemove);
-        if(element.elementType == "Node"){
-            console.log("Attempting to remove restraint from node at ", element.x, ", ", element.y)
-        } else {
-            console.log("Attempting to remove restraint of type " + typeToRemove + " from edge ", element.ID)
+        if(restraintDebug) {
+            console.log("xxxx " + element + typeToRemove);
+            if(element.elementType == "Node"){
+                console.log("Attempting to remove restraint from node at ", element.x, ", ", element.y)
+            } else {
+                console.log("Attempting to remove restraint of type " + typeToRemove + " from edge ", element.ID)
+            }
         }
 
         let removedSuccessfuly = false;
@@ -310,7 +324,7 @@ class PuzzleGrid {
         }
 
         if(removedSuccessfuly){
-            console.log("RC1 " + typeToRemove + " restraint successfully removed")
+            if (restraintDebug) console.log("RC1 " + typeToRemove + " restraint successfully removed")
             return true;
         } else {
             if(typeToRemove == "Number"){
@@ -319,7 +333,7 @@ class PuzzleGrid {
                 element.oneWayRestraint = true;
                 hasOneWayStreets = true; 
             }
-            console.log("RC1 " + typeToRemove + " restraint could not be removed")
+            if (restraintDebug) console.log("RC1 " + typeToRemove + " restraint could not be removed")
             recursionLimitReached = false;
             return false;
         }
@@ -394,11 +408,10 @@ class PuzzleGrid {
         //console.log(edgeArray)
 
         this.edges.forEach(edge => {
-            if(edge.oneWayRestraint){
-                console.log("One way restraint on edge " + edge.ID + 
-                    (edge.canCrossAtoB ? 
-                        " from " + edge.ANode.ID + " to " + edge.BNode.ID : 
-                        " from " + edge.BNode.ID + " to " + edge.ANode.ID))
+            if(restraintDebug && edge.oneWayRestraint){
+                let fromNode = edge.canCrossAtoB ? edge.ANode.ID : edge.BNode.ID;
+                let toNode = edge.canCrossAtoB ? edge.BNode.ID : edge.ANode.ID;
+                console.log("One way restraint on edge " + edge.ID + " from " + fromNode + " to " + toNode);
             }
         })
 

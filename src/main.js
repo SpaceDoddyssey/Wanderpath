@@ -31,13 +31,16 @@ function initRNG(){
     rand.sow(stateInit + Date.now()); //First seed with the date to make sure we get a random seed when we refresh the page
     curSeed = rand.integerInRange(0, Number.MAX_SAFE_INTEGER);
     rand.sow(curSeed.toString());
-    let seedString = createSeedString();
-    document.querySelector('#seedTextArea').value = seedString;
-    console.log("Creating puzzle with seed: ", seedString);
 }
 
 function createSeedString() {
     return `${gridWidth}_${gridHeight}_${maxLength}_${maxCrosses}_${curSeed}`;
+}
+
+function setSeedText() {
+    let seedString = createSeedString();
+    document.querySelector('#seedTextArea').value = seedString;
+    console.log("Created puzzle with seed: ", seedString);
 }
 
 document.querySelector('#seedButton').addEventListener('click', () => {
@@ -135,9 +138,6 @@ function percentBetween(coord1, coord2, proportion){
     return [newX, newY];
 }
 
-let graphics; 
-let game = new Phaser.Game(config);
-
 const Dirs = {
     Up: 0,
     Down: 1,
@@ -168,10 +168,14 @@ function enforceMinMax(field){
     }
 }
 
-
-
 //Debug flags
 let edgeCrossDebug = false
 let restraintDebug = false
 let reachedGoalDebug = false
 let recursiveDebugLevel = 0
+let finalPathDebug = false
+let foundSolutionDebug = false;
+
+//Create the game
+let graphics; 
+let game = new Phaser.Game(config);
