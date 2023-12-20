@@ -8,7 +8,7 @@ class MainScene extends Phaser.Scene {
 
         initRNG();
         document.querySelector('#seedButton').addEventListener('click', () => {
-            if (parseSeedString()){
+            if (parseSeedString(document.querySelector('#seedTextArea').value)){
                 this.regenerateWholeScene();
             }
         });
@@ -26,11 +26,20 @@ class MainScene extends Phaser.Scene {
         //Hook up the button that regenerates the whole game with new given parameters
         document.querySelector('#regenerateGridButton').onclick = this.initRandAndGenerate.bind(this);
 
+        //Check if the user has entered a seed in the URL and parse it if so
+        let urlSeed = false;
+        const seedString = document.location.hash.substring(1);
+        if (seedString) {
+            console.log("Loading seed from URL:", seedString)
+            parseSeedString(seedString);
+            urlSeed = true;
+        }
+        setSeedText();
+
         //Create a new empty puzzle grid
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight, this);
         //Generate a puzzle within the grid
         this.puzzle.generatePuzzle(gridWidth, gridHeight);
-        setSeedText();
 
         this.puzzle.drawGrid();
     }
@@ -59,6 +68,7 @@ class MainScene extends Phaser.Scene {
         initRNG();
         this.regenerateWholeScene(); 
         setSeedText();
+        window.location.hash = document.querySelector('#seedTextArea').value;
     }
 
     //This function is called when the user clicks the Regenerate Game button on the left side of the page

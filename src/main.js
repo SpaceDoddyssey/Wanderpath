@@ -34,7 +34,7 @@ function initRNG(){
 }
 
 function createSeedString() {
-    return `${gridWidth}_${gridHeight}_${maxLength}_${maxCrosses}_${curSeed}`;
+    return `${gridWidth}.${gridHeight}.${maxLength}.${maxCrosses}.${curSeed}`;
 }
 
 function setSeedText() {
@@ -44,12 +44,11 @@ function setSeedText() {
 }
 
 document.querySelector('#seedButton').addEventListener('click', () => {
-    parseSeedString();
+    parseSeedString(document.querySelector('#seedTextArea').value);
 });
-function parseSeedString() {
-    const seedString = document.querySelector('#seedTextArea').value;
+function parseSeedString(seedString) {
     console.log("Loading seed:", seedString);
-    const seedStringRegex = /^\d+_\d+_\d+_\d+_\d+$/;
+    const seedStringRegex = /^\d+.\d+.\d+.\d+.\d+$/;
     if (!seedStringRegex.test(seedString)) {
         let errorMessage = document.querySelector("#HtmlErrorLabel");
         errorMessage.innerHTML = "<b>&nbspInvalid seed format!&nbsp"
@@ -58,7 +57,7 @@ function parseSeedString() {
     
     let seed;
     [widthField.value, heightField.value, lengthField.value, maxCrossField.value, seed]
-        = seedString.split('_')
+        = seedString.split('.')
 
     rand.sow(seed.toString());
     return(getCurParameters() != null);
