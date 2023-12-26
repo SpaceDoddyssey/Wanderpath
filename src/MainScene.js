@@ -33,8 +33,8 @@ class MainScene extends Phaser.Scene {
             console.log("Loading seed from URL:", seedString)
             parseSeedString(seedString);
             urlSeed = true;
-        }
-        setSeedText();
+        } 
+        setSeedText(seedString);
 
         //Create a new empty puzzle grid
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight, this);
@@ -42,12 +42,13 @@ class MainScene extends Phaser.Scene {
         this.puzzle.generatePuzzle(gridWidth, gridHeight);
 
         this.puzzle.drawGrid();
+
+        // window.location.hash = document.querySelector('#seedTextArea').value;
     }
 
     update(){ 
         if (Phaser.Input.Keyboard.JustDown(keyR)) { 
-            initRNG();
-            this.regenerateWholeScene(); 
+            this.initRandAndGenerate(); 
         }
 
         if(Phaser.Input.Keyboard.JustDown(keyUP)){
@@ -67,7 +68,7 @@ class MainScene extends Phaser.Scene {
     initRandAndGenerate(){
         initRNG();
         this.regenerateWholeScene(); 
-        setSeedText();
+        setSeedText(createSeedString());
         window.location.hash = document.querySelector('#seedTextArea').value;
     }
 
@@ -84,5 +85,6 @@ class MainScene extends Phaser.Scene {
         game.scale.resize(newDim[0], newDim[1]);
         
         this.puzzle.resetAndRegenerate();
+        window.location.hash = document.querySelector('#seedTextArea').value;
     }
 }

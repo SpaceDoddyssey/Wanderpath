@@ -37,8 +37,7 @@ function createSeedString() {
     return `${gridWidth}.${gridHeight}.${maxLength}.${maxCrosses}.${curSeed}`;
 }
 
-function setSeedText() {
-    let seedString = createSeedString();
+function setSeedText(seedString) {
     document.querySelector('#seedTextArea').value = seedString;
     console.log("Created puzzle with seed: ", seedString);
 }

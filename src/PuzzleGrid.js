@@ -78,14 +78,13 @@ class PuzzleGrid {
         let attempts = 0;
         //First generate a valid path
         while(!validPuzzle){
-            // console  .clear();
+            console.clear();
             this.targetPath = new Path()
             this.targetPath.generate(this.nodes, maxLength)
 
             this.placeRestraints();
 
             if (restraintDebug) console.log("==== initial restraints placed ====");
-            // this.printGrid(); //Debug
 
             this.nodes.forEach(item => { item.timesCrossed = 0 });
             this.edges.forEach(item => { item.timesCrossed = 0 });
