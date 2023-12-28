@@ -12,7 +12,7 @@ class Node extends GraphElement {
         this.edges = [null, null, null, null];
     }
 
-    draw(graphics){
+    draw(){
         let color = this.timesCrossed > 0 ? 0xFF0000 : 0xFFFFFF;
 
         let loc = this.ScreenLoc();
@@ -20,6 +20,22 @@ class Node extends GraphElement {
             graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], edgeWidth * 1.333)  
         } else {
             graphics.fillStyle(color, 1).fillRect(loc[0] - edgeWidth/2, loc[1] - edgeWidth/2, edgeWidth, edgeWidth)
+        }
+    }
+
+    drawPlayer(){
+        let loc = this.ScreenLoc();
+        graphics.fillStyle(0x0000FF, 1).fillCircle(loc[0], loc[1], edgeWidth / 1.3)
+    }
+
+    drawRestraints() {
+        if (this.numberRestraint != -1) {
+            restraintTexts.push(scene.add.text(
+                this.ScreenLoc()[0], 
+                this.ScreenLoc()[1], 
+                this.numberRestraint, 
+                restraintConfig
+            ).setOrigin(0.5, 0.55));
         }
     }
 
@@ -35,6 +51,15 @@ class Node extends GraphElement {
             this.numberRestraint = this.timesCrossed;
             this.totalRestraints++;
         }
+    }
+
+    tempRemoveRestraint(type){ //type is unused here, but used in Edge
+        this.storedRestraint = this.numberRestraint;
+        this.numberRestraint = -1;
+    }
+
+    restoreRestraint(type){ //type is unused here, but used in Edge
+        this.numberRestraint = this.storedRestraint;
     }
 
     GridLoc(){

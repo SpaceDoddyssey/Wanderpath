@@ -12,6 +12,8 @@ let endNode1, endNode2;
 
 let rand;
 let curSeed;
+const seedButton = document.querySelector('#seedButton');
+const seedTextArea = document.querySelector('#seedTextArea');
 
 //Get references to the value fields
 let widthField    = document.querySelector('#widthField')
@@ -24,6 +26,9 @@ let gridWidth  = widthField.value
 let gridHeight = heightField.value
 let maxLength  = lengthField.value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound
 let maxCrosses = maxCrossField.value //Max times a node or edge can be crossed
+
+let restraintTexts = [];
+let scene;
 
 function initRNG(){ 
     rand = Phaser.Math.RND;
@@ -38,12 +43,12 @@ function createSeedString() {
 }
 
 function setSeedText(seedString) {
-    document.querySelector('#seedTextArea').value = seedString;
+    seedTextArea.value = seedString;
     console.log("Created puzzle with seed: ", seedString);
 }
 
-document.querySelector('#seedButton').addEventListener('click', () => {
-    parseSeedString(document.querySelector('#seedTextArea').value);
+seedButton.addEventListener('click', () => {
+    parseSeedString(seedTextArea.value);
 });
 function parseSeedString(seedString) {
     console.log("Loading seed:", seedString);
@@ -172,7 +177,8 @@ let restraintDebug = false
 let reachedGoalDebug = false
 let recursiveDebugLevel = 0
 let finalPathDebug = false
-let foundSolutionDebug = false;
+let foundSolutionDebug = false
+let playerMoveDebug = false
 
 //Create the game
 let graphics; 

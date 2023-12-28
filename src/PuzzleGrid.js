@@ -1,21 +1,22 @@
 class PuzzleGrid {
-    constructor(gridWidth, gridHeight, scene) {
+    constructor(gridWidth, gridHeight) {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.scene = scene;
-        this.restraintTexts = [];
+        restraintTexts = [];
 
-        this.populateGrid(gridWidth, gridHeight);
-
-        this.playerNode = this.nodes[0];
+        this.populateGrid(gridWidth, gridHeight);;
     }
     
     movePlayer(direction){
         let edge = this.playerNode.edges[direction];
         if(edge != null && edge.canCross(this.playerNode)){
             this.playerNode = edge.otherNode(this.playerNode);
+        } else {
+            if (playerMoveDebug) console.log("Player can't move in that direction");
+            return false;
         }
-        console.log("Player moved to node " + this.playerNode.ID);
+        if (playerMoveDebug) console.log("Player moved to node " + this.playerNode.ID);
+        this.drawGrid();
     }
 
     populateGrid(width, height){
@@ -59,13 +60,13 @@ class PuzzleGrid {
     }
 
     resetGrid(){
-        this.scene.targetPath = null
+        scene.targetPath = null
         this.nodes.forEach(node => node.reset());
         this.edges.forEach(edge => edge.reset());
-        this.restraintTexts.forEach(text => {
+        restraintTexts.forEach(text => {
             text.destroy()
         })
-        this.restraintTexts = [];
+        restraintTexts = [];
         hasOneWayStreets = false;
     }
 
@@ -116,6 +117,7 @@ class PuzzleGrid {
         }
 
         //Now we have a valid path, so we can start removing restraints
+        //First create a list of restraints
         this.restraintList = [];
         this.allElements.forEach(element => {
             if(element.numberRestraint != -1){
@@ -126,17 +128,16 @@ class PuzzleGrid {
                 this.restraintList.push([element, "OneWay"]);
             }
         })
-        rand.shuffle(this.restraintList);
 
         //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
+        rand.shuffle(this.restraintList);
         this.restraintList.forEach(restraint => {
             this.tryRemoveRestraint(restraint[0], restraint[1]);    
         })
         
         if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
 
-        // this.printGrid() //Debug
-        this.drawGrid()
+        this.playerNode = endNode1;
     }
 
     placeRestraints(){   
@@ -146,26 +147,16 @@ class PuzzleGrid {
     }
 
     allRestraintsSatisfied(){
-        let counter = 0
-        for(let i = 0; i < this.allElements.length; i++){    
-            let element = this.allElements[i];
-            counter++
-            //console.log("Checking element " + counter);
-            if(element.restraintsSatisfied() == false) { 
-                //console.log("Not fulfilled, crossed ", element.timesCrossed, " times instead of ", element.numberRestraint)
-                return false 
-            }
-        }
-        return true
+        // .some tests whether at least one restraint is not satisfied
+        return !this.allElements.some(element => !element.restraintsSatisfied());
     }
 
     // Called on an existing puzzle to check the number of possible solutions to the puzzle 
     // Used for restraint removal
     checkSolutions(startNode, targetNode){
         // Check for solutions from the first of the two end nodes
-        this.solutionNodeList = []
+        this.solutionNodeList = [startNode.ID];
 
-        this.solutionNodeList.push(startNode.ID)
         num_solutions = 0;
         recursionCounter = 0;
         this.recursiveSolutionFinder(startNode, targetNode, Dirs.Endpoint, 0);
@@ -271,9 +262,6 @@ class PuzzleGrid {
             if(num_solutions > 1) return
         }
 
-        // if(solutions > 0){
-        //     console.log("Branch with ", solutions, " solutions")
-        // }
         return
     }
 
@@ -288,15 +276,9 @@ class PuzzleGrid {
         }
 
         let removedSuccessfuly = false;
-        let restraint = element.numberRestraint;
-        if(typeToRemove == "Number"){
-            //Save and remove the restraint on the element
-            element.numberRestraint = -1;
-
-            // this.printGrid() //Debug
-        } else if (typeToRemove == "OneWay"){
-            element.oneWayRestraint = false;
-
+        
+        element.tempRemoveRestraint(typeToRemove);
+        if (typeToRemove == "OneWay"){
             //Check if there are any one way streets remaining
             hasOneWayStreets = false;
             this.edges.forEach(edge => {
@@ -304,7 +286,7 @@ class PuzzleGrid {
             })
         }
 
-        //Logic is the same for all restraint types
+        //This logic is the same for all restraint types
         let solutionsFromEN1 = this.checkSolutions(endNode1, endNode2);
         if(hasOneWayStreets){
             //If there's more than one solution from EN1 we don't care how many from EN2
@@ -326,12 +308,7 @@ class PuzzleGrid {
             if (restraintDebug) console.log("RC1 " + typeToRemove + " restraint successfully removed")
             return true;
         } else {
-            if(typeToRemove == "Number"){
-                element.numberRestraint = restraint;
-            } else if (typeToRemove == "OneWay"){
-                element.oneWayRestraint = true;
-                hasOneWayStreets = true; 
-            }
+            element.restoreRestraint(typeToRemove);
             if (restraintDebug) console.log("RC1 " + typeToRemove + " restraint could not be removed")
             recursionLimitReached = false;
             return false;
@@ -344,56 +321,20 @@ class PuzzleGrid {
 
     drawGrid(){
         graphics.clear();
-        [...this.edges, ...this.nodes].forEach(element => {
-            element.draw(graphics);
-        });
-        this.drawRestraints();
-    }
-
-    drawRestraints(){
-        this.restraintTexts.forEach(text => {
+        restraintTexts.forEach(text => {
             //console.log("text")
             text.destroy()
         })
-        this.restraintTexts = [];
+        restraintTexts = [];
+        this.allElements.forEach(element => {
+            element.draw();
+        });
 
-        this.nodes.forEach(node => {
-            if(node.numberRestraint != -1){
-                this.restraintTexts.push(this.scene.add.text((node.ScreenLoc())[0], 
-                    (node.ScreenLoc())[1], 
-                    node.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
-            }
-        })
-        this.edges.forEach(edge => {
-            if(edge.numberRestraint != -1){
-                this.restraintTexts.push(this.scene.add.text((edge.ScreenLoc())[0], 
-                    (edge.ScreenLoc())[1], 
-                    edge.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
-            }
-            if(edge.oneWayRestraint){
-                let [ANodeLoc, BNodeLoc] = [edge.ANode.ScreenLoc(), edge.BNode.ScreenLoc()];
-                let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.85), percentBetween(ANodeLoc, BNodeLoc, 0.85)];
-                graphics.lineStyle(3, 0x83BCFF, 1.0);
+        // this.playerNode.drawPlayer();
 
-                let [CLoc, DLoc] = [[], []];
-                let firstLoc, secondLoc;
-
-                let horizontalOrVertical = edge.ANode.y == edge.BNode.y ? 1 : 0;
-
-                [firstLoc, secondLoc] = edge.canCrossAtoB ? [ALoc, BLoc] : [BLoc, ALoc];
-                [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = edge.canCrossAtoB ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];
-                CLoc[horizontalOrVertical] -= edgeWidth / 5.1;
-                DLoc[horizontalOrVertical] += edgeWidth / 5.1;
-                
-                graphics.beginPath();
-                graphics.moveTo(...firstLoc);
-                graphics.lineTo(...secondLoc);
-                graphics.lineTo(...CLoc);
-                graphics.lineTo(...DLoc);
-                graphics.lineTo(...secondLoc);
-                graphics.stroke();
-            }
-        })
+        this.allElements.forEach(element => {
+            element.drawRestraints();
+        });
     }
 
     //Prints the grid to console for debug purposes
