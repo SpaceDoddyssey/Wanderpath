@@ -20,6 +20,7 @@ class MainScene extends Phaser.Scene {
         keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        keyZ     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
@@ -51,6 +52,8 @@ class MainScene extends Phaser.Scene {
             this.initRandAndGenerate(); 
         }
 
+        if(!playerMovementEnabled) return;
+
         if(Phaser.Input.Keyboard.JustDown(keyUP)){
             this.puzzle.movePlayer(Dirs.Up);
         }
@@ -62,6 +65,10 @@ class MainScene extends Phaser.Scene {
         }
         if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
             this.puzzle.movePlayer(Dirs.Right);
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(keyZ)){
+            this.puzzle.undoMove();
         }
     }
 

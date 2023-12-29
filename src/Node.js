@@ -13,7 +13,7 @@ class Node extends GraphElement {
     }
 
     draw(){
-        let color = this.timesCrossed > 0 ? 0xFF0000 : 0xFFFFFF;
+        let color = getElementColor(this.timesCrossed);
 
         let loc = this.ScreenLoc();
         if(this.endPoint){
@@ -23,7 +23,7 @@ class Node extends GraphElement {
         }
     }
 
-    drawPlayer(){
+    drawPlayer(lastDir){
         let loc = this.ScreenLoc();
         graphics.fillStyle(0x0000FF, 1).fillCircle(loc[0], loc[1], edgeWidth / 1.3)
     }

@@ -4,18 +4,41 @@ class PuzzleGrid {
         this.gridHeight = gridHeight;
         restraintTexts = [];
 
-        this.populateGrid(gridWidth, gridHeight);;
+        this.populateGrid(gridWidth, gridHeight);
+        this.playerDirStack = [Dirs.EndPoint]; 
     }
     
     movePlayer(direction){
-        let edge = this.playerNode.edges[direction];
-        if(edge != null && edge.canCross(this.playerNode)){
-            this.playerNode = edge.otherNode(this.playerNode);
+        let edge = playerNode.edges[direction];
+
+        let lastDir = this.playerDirStack[this.playerDirStack.length - 1];
+        if(lastDir == InverseDirs[direction]){
+            edge.uncross(edge.otherNode(playerNode));
+            playerNode.uncross();
+            this.playerDirStack.pop();
         } else {
-            if (playerMoveDebug) console.log("Player can't move in that direction");
-            return false;
+            if(edge == null || !edge.canCross(playerNode)){
+                if (playerMoveDebug) console.log("Player can't move in that direction");
+                return false;
+            }
+            edge.cross(playerNode);
+            edge.otherNode(playerNode).cross();
+            this.playerDirStack.push(direction);
         }
-        if (playerMoveDebug) console.log("Player moved to node " + this.playerNode.ID);
+        
+        playerNode = edge.otherNode(playerNode);
+        if (playerMoveDebug) console.log("Player moved to node " + playerNode.ID);
+        this.drawGrid();
+    }
+
+    undoMove(){
+        if(this.playerDirStack.length <= 1) return;
+        let edge = playerNode.edges[InverseDirs[this.playerDirStack[this.playerDirStack.length - 1]]];
+
+        edge.uncross(edge.otherNode(playerNode));
+        playerNode.uncross();
+        playerNode = edge.otherNode(playerNode);
+        this.playerDirStack.pop();
         this.drawGrid();
     }
 
@@ -60,11 +83,11 @@ class PuzzleGrid {
     }
 
     resetGrid(){
-        scene.targetPath = null
+        scene.targetPath = null;
         this.nodes.forEach(node => node.reset());
         this.edges.forEach(edge => edge.reset());
         restraintTexts.forEach(text => {
-            text.destroy()
+            text.destroy();
         })
         restraintTexts = [];
         hasOneWayStreets = false;
@@ -137,7 +160,7 @@ class PuzzleGrid {
         
         if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
 
-        this.playerNode = endNode1;
+        playerNode = endNode1;
     }
 
     placeRestraints(){   
@@ -322,7 +345,6 @@ class PuzzleGrid {
     drawGrid(){
         graphics.clear();
         restraintTexts.forEach(text => {
-            //console.log("text")
             text.destroy()
         })
         restraintTexts = [];
@@ -330,7 +352,9 @@ class PuzzleGrid {
             element.draw();
         });
 
-        // this.playerNode.drawPlayer();
+        if (playerMovementEnabled) { 
+            playerNode.drawPlayer(this.playerDirStack[this.playerDirStack.length - 1]);
+        }
 
         this.allElements.forEach(element => {
             element.drawRestraints();

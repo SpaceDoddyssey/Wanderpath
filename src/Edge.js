@@ -144,8 +144,8 @@ class Edge extends GraphElement {
     draw(){
         let [ALoc, BLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
 
-        //First draw the base line
-        let color = this.timesCrossed > 0 ? 0xFF0000 : 0xFFFFFF;
+        let color = getElementColor(this.timesCrossed);
+
         graphics.lineStyle(edgeWidth, color, 1.0);
         
         graphics.beginPath();

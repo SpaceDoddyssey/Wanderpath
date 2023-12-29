@@ -29,6 +29,7 @@ let maxCrosses = maxCrossField.value //Max times a node or edge can be crossed
 
 let restraintTexts = [];
 let scene;
+let playerNode;
 
 function initRNG(){ 
     rand = Phaser.Math.RND;
@@ -129,6 +130,20 @@ let restraintConfig = {
     align: 'center'
 }
 
+function getElementColor(timesCrossed){
+    let color;
+    if (timesCrossed === 0) {
+        color = 0xFFFFFF; 
+    } else if (timesCrossed >= 1 && timesCrossed <= 5) {
+        const gradient = Math.floor((maxCrosses - timesCrossed) * (255 / 4));
+        color = (gradient << 16) | (gradient << 8) | 0xFF; 
+    } else {
+        color = 0xFF0000; 
+    }
+
+    return color;
+}
+
 //Returns a point 90% of the way between coord1 and coord2
 //Used only for one-way-streets right now
 function percentBetween(coord1, coord2, proportion){
@@ -151,7 +166,7 @@ const Dirs = {
 const InverseDirs = [Dirs.Down, Dirs.Up, Dirs.Right, Dirs.Left, Dirs.Endpoint]
 const dirNames = ["north", "south", "west", "east"]
 
-let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR;
+let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR, keyZ;
 
 let recursionCounter = 0;
 let recursionLimit = 30000;
@@ -179,6 +194,9 @@ let recursiveDebugLevel = 0
 let finalPathDebug = false
 let foundSolutionDebug = false
 let playerMoveDebug = false
+
+//Use to disable or enable player movement while it's under construction
+let playerMovementEnabled = false;
 
 //Create the game
 let graphics; 
