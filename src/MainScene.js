@@ -25,15 +25,17 @@ class MainScene extends Phaser.Scene {
         AKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         SKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         DKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        XKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        QKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
-        //Hook up the button that regenerates the whole game with new given parameters
-        document.querySelector('#regenerateGridButton').onclick = this.initRandAndGenerate.bind(this);
-
-        //Hook up the undo button
+        //Hook up buttons that call scene functions
+        document.querySelector('#regenerateGridButton').onclick = () => { this.initRandAndGenerate(); };
         document.querySelector('#undoButton').onclick = () => { this.puzzle.undoMove(); };
+        document.querySelector('#resetButton').onclick = () => { this.puzzle.resetPlayer(); };
+        document.querySelector('#changeStartNodeButton').onclick = () => { this.puzzle.changeStartNode(); };
 
         //Create a new empty puzzle grid
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight);
@@ -55,20 +57,16 @@ class MainScene extends Phaser.Scene {
     }
 
     update(){ 
-        if (Phaser.Input.Keyboard.JustDown(RKey)) { 
-            this.initRandAndGenerate(); 
-        }
+        if (Phaser.Input.Keyboard.JustDown(RKey)) { this.initRandAndGenerate(); }
 
         if(!playerMovementEnabled) return;
 
+        //Input handling
         let curDirKey = this.currentDirectionKey();
-        if(curDirKey != null){
-            this.puzzle.movePlayer(curDirKey);
-        }
-
-        if(Phaser.Input.Keyboard.JustDown(ZKey)){
-            this.puzzle.undoMove();
-        }
+        if(curDirKey != null){ this.puzzle.movePlayer(curDirKey); }
+        if(Phaser.Input.Keyboard.JustDown(ZKey)){ this.puzzle.undoMove(); }
+        if(Phaser.Input.Keyboard.JustDown(XKey)){ this.puzzle.resetPlayer(); }
+        if(Phaser.Input.Keyboard.JustDown(QKey)){ this.puzzle.changeStartNode(); }
     }
 
     currentDirectionKey(){

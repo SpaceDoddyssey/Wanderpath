@@ -7,40 +7,6 @@ class PuzzleGrid {
         this.populateGrid(gridWidth, gridHeight);
         this.playerDirStack = [Dirs.EndPoint]; 
     }
-    
-    movePlayer(direction){
-        let edge = playerNode.edges[direction];
-
-        let lastDir = this.playerDirStack[this.playerDirStack.length - 1];
-        if(lastDir == InverseDirs[direction]){
-            edge.uncross(edge.otherNode(playerNode));
-            playerNode.uncross();
-            this.playerDirStack.pop();
-        } else {
-            if(edge == null || !edge.canCross(playerNode) || !edge.otherNode(playerNode).canCross()){
-                if (playerMoveDebug) console.log("Player can't move in that direction");
-                return false;
-            }
-            edge.cross(playerNode);
-            edge.otherNode(playerNode).cross();
-            this.playerDirStack.push(direction);
-        }
-        
-        playerNode = edge.otherNode(playerNode);
-        if (playerMoveDebug) console.log("Player moved to node " + playerNode.ID);
-        this.drawGrid();
-    }
-
-    undoMove(){
-        if(this.playerDirStack.length <= 1) return;
-        let edge = playerNode.edges[InverseDirs[this.playerDirStack[this.playerDirStack.length - 1]]];
-
-        edge.uncross(edge.otherNode(playerNode));
-        playerNode.uncross();
-        playerNode = edge.otherNode(playerNode);
-        this.playerDirStack.pop();
-        this.drawGrid();
-    }
 
     populateGrid(width, height){
         this.nodes = []
@@ -91,6 +57,73 @@ class PuzzleGrid {
         })
         restraintTexts = [];
         hasOneWayStreets = false;
+    }
+
+//###################################################################################################################
+//#################################################### GAMEPLAY #####################################################   
+//###################################################################################################################
+    
+    movePlayer(direction){
+        let edge = playerNode.edges[direction];
+
+        let lastDir = this.playerDirStack[this.playerDirStack.length - 1];
+        if(lastDir == InverseDirs[direction]){
+            edge.uncross(edge.otherNode(playerNode));
+            playerNode.uncross();
+            this.playerDirStack.pop();
+        } else {
+            if(edge == null || !edge.canCross(playerNode) || !edge.otherNode(playerNode).canCross()){
+                if (playerMoveDebug) console.log("Player can't move in that direction");
+                return false;
+            }
+            edge.cross(playerNode);
+            edge.otherNode(playerNode).cross();
+            this.playerDirStack.push(direction);
+        }
+        
+        playerNode = edge.otherNode(playerNode);
+        if (playerMoveDebug) console.log("Player moved to node " + playerNode.ID);
+        this.drawGrid();
+    }
+
+    undoMove(){
+        if(this.playerDirStack.length <= 1) return;
+        let edge = playerNode.edges[InverseDirs[this.playerDirStack[this.playerDirStack.length - 1]]];
+
+        edge.uncross(edge.otherNode(playerNode));
+        playerNode.uncross();
+        playerNode = edge.otherNode(playerNode);
+        this.playerDirStack.pop();
+        this.drawGrid();
+    }
+
+    resetPlayer(){
+        while(this.playerDirStack.length > 1){
+            this.undoMove();
+        }
+    }
+
+    changeStartNode(){
+        this.resetPlayer();
+        if(playerNode == endNode1){
+            endNode1.uncross();
+            endNode2.cross();
+            playerNode = endNode2;
+        } else {
+            endNode2.uncross();
+            endNode1.cross();
+            playerNode = endNode1;
+        }
+        this.drawGrid();
+    }
+
+    checkWin(){
+        if(playerNode == endNode1 || playerNode == endNode2){
+            if(this.allRestraintsSatisfied()){
+                let winMessage = document.querySelector("#HtmlWinLabel");
+                winMessage.innerHTML = "&nbsp&nbsp&"
+            }
+        }
     }
 
 //###################################################################################################################

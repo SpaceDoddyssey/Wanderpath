@@ -166,7 +166,7 @@ const Dirs = {
 const InverseDirs = [Dirs.Down, Dirs.Up, Dirs.Right, Dirs.Left, Dirs.Endpoint]
 const dirNames = ["north", "south", "west", "east"]
 
-let UpKey, DownKey, LeftKey, RightKey, RKey, ZKey, WKey, AKey, SKey, DKey;
+let UpKey, DownKey, LeftKey, RightKey, RKey, ZKey, WKey, AKey, SKey, DKey, XKey, QKey;
 
 let recursionCounter = 0;
 let recursionLimit = 30000;
