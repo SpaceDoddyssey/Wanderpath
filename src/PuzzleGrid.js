@@ -119,7 +119,7 @@ class PuzzleGrid {
 
     checkWin(){
         let winMessage = document.querySelector("#HtmlWinLabel");
-        if(playerNode != endNode1 && playerNode != endNode2){
+        if(playerNode != this.goalNode){
             winMessage.innerHTML = "You're not at the goal node!";
         }
 
