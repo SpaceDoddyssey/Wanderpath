@@ -27,6 +27,7 @@ class MainScene extends Phaser.Scene {
         DKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         XKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
         QKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        EnterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
@@ -36,6 +37,7 @@ class MainScene extends Phaser.Scene {
         document.querySelector('#undoButton').onclick = () => { this.puzzle.undoMove(); };
         document.querySelector('#resetButton').onclick = () => { this.puzzle.resetPlayer(); };
         document.querySelector('#changeStartNodeButton').onclick = () => { this.puzzle.changeStartNode(); };
+        document.querySelector('#checkSolutionButton').onclick = () => { this.puzzle.checkWin(); };
 
         //Create a new empty puzzle grid
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight);
@@ -67,6 +69,7 @@ class MainScene extends Phaser.Scene {
         if(Phaser.Input.Keyboard.JustDown(ZKey)){ this.puzzle.undoMove(); }
         if(Phaser.Input.Keyboard.JustDown(XKey)){ this.puzzle.resetPlayer(); }
         if(Phaser.Input.Keyboard.JustDown(QKey)){ this.puzzle.changeStartNode(); }
+        if(Phaser.Input.Keyboard.JustDown(EnterKey)){ this.puzzle.checkWin(); }
     }
 
     currentDirectionKey(){

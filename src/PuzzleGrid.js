@@ -6,6 +6,8 @@ class PuzzleGrid {
 
         this.populateGrid(gridWidth, gridHeight);
         this.playerDirStack = [Dirs.EndPoint]; 
+        this.goalNode = null;
+        this.startNode = null;
     }
 
     populateGrid(width, height){
@@ -64,6 +66,7 @@ class PuzzleGrid {
 //###################################################################################################################
     
     movePlayer(direction){
+        document.querySelector("#HtmlWinLabel").innerHTML = "";
         let edge = playerNode.edges[direction];
 
         let lastDir = this.playerDirStack[this.playerDirStack.length - 1];
@@ -87,6 +90,7 @@ class PuzzleGrid {
     }
 
     undoMove(){
+        document.querySelector("#HtmlWinLabel").innerHTML = "";
         if(this.playerDirStack.length <= 1) return;
         let edge = playerNode.edges[InverseDirs[this.playerDirStack[this.playerDirStack.length - 1]]];
 
@@ -98,6 +102,7 @@ class PuzzleGrid {
     }
 
     resetPlayer(){
+        document.querySelector("#HtmlWinLabel").innerHTML = "";
         while(this.playerDirStack.length > 1){
             this.undoMove();
         }
@@ -105,23 +110,24 @@ class PuzzleGrid {
 
     changeStartNode(){
         this.resetPlayer();
-        if(playerNode == endNode1){
-            endNode1.uncross();
-            endNode2.cross();
-            playerNode = endNode2;
-        } else {
-            endNode2.uncross();
-            endNode1.cross();
-            playerNode = endNode1;
-        }
+        this.startNode.uncross();
+        this.goalNode.cross();
+        playerNode = this.goalNode;
+        [this.startNode, this.goalNode] = [this.goalNode, this.startNode];
         this.drawGrid();
     }
 
     checkWin(){
+        let winMessage = document.querySelector("#HtmlWinLabel");
+        if(playerNode != endNode1 && playerNode != endNode2){
+            winMessage.innerHTML = "You're not at the goal node!";
+        }
+
         if(playerNode == endNode1 || playerNode == endNode2){
             if(this.allRestraintsSatisfied()){
-                let winMessage = document.querySelector("#HtmlWinLabel");
-                winMessage.innerHTML = "&nbsp&nbsp&"
+                winMessage.innerHTML = "Puzzle solved!";
+            } else {
+                winMessage.innerHTML = "Some restraints aren't satisfied!";
             }
         }
     }
@@ -194,6 +200,8 @@ class PuzzleGrid {
         if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
 
         playerNode = endNode1;
+        this.startNode = endNode1;
+        this.goalNode = endNode2;
         endNode1.cross();
     }
 
