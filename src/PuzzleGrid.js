@@ -17,7 +17,7 @@ class PuzzleGrid {
             playerNode.uncross();
             this.playerDirStack.pop();
         } else {
-            if(edge == null || !edge.canCross(playerNode)){
+            if(edge == null || !edge.canCross(playerNode) || !edge.otherNode(playerNode).canCross()){
                 if (playerMoveDebug) console.log("Player can't move in that direction");
                 return false;
             }
@@ -68,7 +68,7 @@ class PuzzleGrid {
                 }
             }
         }
-        this.allElements = [...this.nodes, ...this.edges];
+        this.allElements = [...this.edges, ...this.nodes];
     }
 
     resetAndRegenerate(){
@@ -102,7 +102,7 @@ class PuzzleGrid {
         let attempts = 0;
         //First generate a valid path
         while(!validPuzzle){
-            console.clear();
+            // console.clear();
             this.targetPath = new Path()
             this.targetPath.generate(this.nodes, maxLength)
 
@@ -161,6 +161,7 @@ class PuzzleGrid {
         if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
 
         playerNode = endNode1;
+        endNode1.cross();
     }
 
     placeRestraints(){   

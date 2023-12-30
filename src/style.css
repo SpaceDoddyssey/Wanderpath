@@ -2,6 +2,7 @@
 body {
     font-family: 'Open Sans', Regular;
     background-color: #83BCFF;
+    display: grid;
     grid-template:
         "col1 col2 col3" 1fr
         / 33.33vw 33.33vw 33.33vw;

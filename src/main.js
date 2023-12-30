@@ -166,7 +166,7 @@ const Dirs = {
 const InverseDirs = [Dirs.Down, Dirs.Up, Dirs.Right, Dirs.Left, Dirs.Endpoint]
 const dirNames = ["north", "south", "west", "east"]
 
-let keyUP, keyDOWN, keyLEFT, keyRIGHT, keyR, keyZ;
+let UpKey, DownKey, LeftKey, RightKey, RKey, ZKey, WKey, AKey, SKey, DKey;
 
 let recursionCounter = 0;
 let recursionLimit = 30000;
@@ -191,12 +191,12 @@ let edgeCrossDebug = false
 let restraintDebug = false
 let reachedGoalDebug = false
 let recursiveDebugLevel = 0
-let finalPathDebug = false
+let finalPathDebug = true
 let foundSolutionDebug = false
 let playerMoveDebug = false
 
 //Use to disable or enable player movement while it's under construction
-let playerMovementEnabled = false;
+let playerMovementEnabled = true;
 
 //Create the game
 let graphics; 

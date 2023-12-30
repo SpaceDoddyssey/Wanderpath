@@ -15,18 +15,25 @@ class MainScene extends Phaser.Scene {
         });
 
         // define keys 
-        keyUP    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        keyDOWN  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        keyLEFT  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        keyR     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        keyZ     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        UpKey    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+        DownKey  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        LeftKey  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        RightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        RKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        ZKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        WKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        AKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        SKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        DKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
         // show game title text
         this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
         //Hook up the button that regenerates the whole game with new given parameters
         document.querySelector('#regenerateGridButton').onclick = this.initRandAndGenerate.bind(this);
+
+        //Hook up the undo button
+        document.querySelector('#undoButton').onclick = () => { this.puzzle.undoMove(); };
 
         //Create a new empty puzzle grid
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight);
@@ -48,28 +55,28 @@ class MainScene extends Phaser.Scene {
     }
 
     update(){ 
-        if (Phaser.Input.Keyboard.JustDown(keyR)) { 
+        if (Phaser.Input.Keyboard.JustDown(RKey)) { 
             this.initRandAndGenerate(); 
         }
 
         if(!playerMovementEnabled) return;
 
-        if(Phaser.Input.Keyboard.JustDown(keyUP)){
-            this.puzzle.movePlayer(Dirs.Up);
-        }
-        if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
-            this.puzzle.movePlayer(Dirs.Down);
-        }
-        if(Phaser.Input.Keyboard.JustDown(keyLEFT)){
-            this.puzzle.movePlayer(Dirs.Left);
-        }
-        if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
-            this.puzzle.movePlayer(Dirs.Right);
+        let curDirKey = this.currentDirectionKey();
+        if(curDirKey != null){
+            this.puzzle.movePlayer(curDirKey);
         }
 
-        if(Phaser.Input.Keyboard.JustDown(keyZ)){
+        if(Phaser.Input.Keyboard.JustDown(ZKey)){
             this.puzzle.undoMove();
         }
+    }
+
+    currentDirectionKey(){
+        if(Phaser.Input.Keyboard.JustDown(UpKey) || Phaser.Input.Keyboard.JustDown(WKey))    return Dirs.Up;
+        if(Phaser.Input.Keyboard.JustDown(DownKey) || Phaser.Input.Keyboard.JustDown(SKey))  return Dirs.Down;
+        if(Phaser.Input.Keyboard.JustDown(LeftKey) || Phaser.Input.Keyboard.JustDown(AKey))  return Dirs.Left;
+        if(Phaser.Input.Keyboard.JustDown(RightKey) || Phaser.Input.Keyboard.JustDown(DKey)) return Dirs.Right;
+        return null;
     }
 
     initRandAndGenerate(){

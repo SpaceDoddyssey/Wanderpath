@@ -55,15 +55,26 @@
         <div id="game"></div>
     </div>
 
-    <!-- Descriptive text -->
-    <p class="center-text"><b>Wanderpath</b> is a new kind of puzzle game</p>
-    <p class="center-text"><b>The Goal:</b><br></bt></nt>Start on one of the large circular nodes and trace a path to the other node.<br>
-                            If there is only one node, trace a path back to the same node you started from</p>
-    <p class="center-text"><b>The Catch:</b><br>The path can cross over itself (but not double back)<br>
-                            A number on an edge or node indicates that the path must touch that edge/node <i>exactly</i> the indicated number of times<br>
-                            A blue arrow on an edge indicates that the edge must be crossed at least once, but can only be crossed from the wide end of the arrow to the point<br>
-                            Note: If arrows are present, it may be possible that there is only a solution from one of the two nodes!</p>
-    <p class="center-text">Design and programming by <b>Cameron Dodd</b></p>
+    <!-- Controls -->
+    <div class="center-text" style="grid-area:col3">
+        -- Controls --
+        <br>WASD/Arrow Keys to move
+        <br><button type="button" id="undoButton">Undo (Z)</button>
+        <!-- <br><button type="button" id="changeStartNodeButton">Change Starting Node (Q)</button>
+        <br><button type="button" id="checkSolutionButton">Check Solution (Enter)</button> -->
+    </div>
+
+    <div class="column" style="grid-column-start: col1; grid-column-end: col3">
+        <!-- Descriptive text -->
+        <p class="center-text"><b>Wanderpath</b> is a new kind of puzzle game</p>
+        <p class="center-text"><b>The Goal:</b><br></bt></nt>Start on one of the large circular nodes and trace a path to the other node.<br>
+                                If there is only one node, trace a path back to the same node you started from</p>
+        <p class="center-text"><b>The Catch:</b><br>The path can cross over itself (but not double back)<br>
+                                A number on an edge or node indicates that the path must touch that edge/node <i>exactly</i> the indicated number of times<br>
+                                A blue arrow on an edge indicates that the edge must be crossed at least once, but can only be crossed from the wide end of the arrow to the point<br>
+                                Note: If arrows are present, it may be possible that there is only a solution from one of the two nodes!</p>
+        <p class="center-text">Design and programming by <b>Cameron Dodd</b></p>
+    </div>
 
     <!-- Imports -->
     <script src="./lib/phaser.js"></script>
