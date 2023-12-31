@@ -5,7 +5,7 @@ body {
     display: grid;
     grid-template:
         "col1 col2 col3" 1fr
-        / 33.33vw 33.33vw 33.33vw;
+        / 20vw 45vw 35vw;
 }
 .num-field-col {
     position: absolute;
@@ -21,3 +21,15 @@ body {
     width: 192px; 
     height: 18px; 
 }   
+.title {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    color: rgba(73, 0, 118, 0.867);
+    font-family: 'Georgia';
+    font: Georgia;
+}
+.subtitle {
+    text-align: center;
+    padding: -5px;
+}

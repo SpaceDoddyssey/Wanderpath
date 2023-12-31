@@ -1,19 +1,18 @@
 // Note: This file is mostly used to store globals and utility functions
 // Go to index.html for webpage stuff and MainScene.js for puzzle stuff
 
-let UIspacerheight = 64;
-let borderPadding = 32;
-let sizePerUnit = 92;
-let edgeWidth = 18;
+let UIspacerheight = 128;
+let borderPadding = 0; //Set this to zero but keeping around in case I change my mind
+let sizePerUnit = 100;
+let edgeWidth = 20;
 
-let hasOneWayStreets = false; //Future feature
+let hasOneWayStreets = false; 
 let num_solutions = 0;
 let endNode1, endNode2;
 
 let rand;
 let curSeed;
 const seedButton = document.querySelector('#seedButton');
-const seedTextArea = document.querySelector('#seedTextArea');
 
 //Get references to the value fields
 let widthField    = document.querySelector('#widthField')
@@ -43,14 +42,18 @@ function createSeedString() {
     return `${gridWidth}.${gridHeight}.${maxLength}.${maxCrosses}.${curSeed}`;
 }
 
-function setSeedText(seedString) {
-    seedTextArea.value = seedString;
-    console.log("Created puzzle with seed: ", seedString);
+function copyBaseURL() {
+    navigator.clipboard.writeText("https://spacedoddyssey.github.io/Wanderpath/");
+    document.querySelector("#shareButton").innerHTML = "Copied to clipboard!"
+    setTimeout(() => { document.querySelector("#shareButton").innerHTML = "Share Wanderpath" }, 1000);
 }
 
-seedButton.addEventListener('click', () => {
-    parseSeedString(seedTextArea.value);
-});
+function copySeedURL() {
+    navigator.clipboard.writeText("https://spacedoddyssey.github.io/Wanderpath/#" + createSeedString());
+    document.querySelector("#sharePuzzleButton").innerHTML = "Copied to clipboard!"
+    setTimeout(() => { document.querySelector("#sharePuzzleButton").innerHTML = "Share this puzzle" }, 1000);
+}
+
 function parseSeedString(seedString) {
     console.log("Loading seed:", seedString);
     const seedStringRegex = /^\d+.\d+.\d+.\d+.\d+$/;
@@ -109,18 +112,6 @@ let config = {
     height: defaultDimensions[1],
     parent: "game",
     scene:[ MainScene ]
-}
-
-let textConfig = {
-    fontFamily: 'Georgia',
-    fontSize: '28px',
-    color: '#00F6ED',
-    align: 'right',
-    padding: {
-        top: 5,
-        bottom: 5,
-    },
-    fixedWidth: 0
 }
 
 let restraintConfig = {

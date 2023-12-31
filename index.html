@@ -10,9 +10,12 @@
 </head>
 
 <body>
-    <!-- Number field column -->
+    <!-- Game Settings and Controls -->
     <div id="numFieldCol" class="column num-field-col" style="grid-area:col1">
         <!-- First we create the parameter fields and associated labels -->
+        <br><br>
+        <div class="center-text"><b>-- Puzzle Settings --</b></div>
+        <br>
         <script>
             function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
                 const div = document.createElement("div");
@@ -20,7 +23,7 @@
                 div.innerHTML = `<input type="number" id="${id}" name="${id}" style="width:40px" required 
                                 onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
                                 <label for="${labelFor}" style="background-color:#00F6ED;">${labelText} (${minVal}-${maxVal})</label>
-                                <br><br>`;
+                                <br>`;
                 document.getElementById("numFieldCol").appendChild(div);
             }
 
@@ -35,49 +38,57 @@
         </script>
 
         <!-- Button to regenerate the grid -->
-        <div class="flex-row">
+        <div class="center-text">
         <button type="button" id="regenerateGridButton">Regenerate Game (R)</button>
         </div>
 
         <!-- Spot for a warning label if you entered invalid parameters -->
         <label id="HtmlErrorLabel" style="background-color:#ff0404;"> </label>
 
-        <br><br><br>
-        Seed:
-        <textArea id="seedTextArea" class="seed-text" placeholder="Seed"></textArea>
-        <button type="button" id="seedButton" style="width: 120px">Load From Seed</button>
+        <!-- Controls -->
+        <div class="center-text">
+            <br>
+            <b>-- Controls --</b>
+            <br>
+            <br>WASD/Arrow Keys to move
+            <br><button type="button" id="undoButton">Undo (Z)</button>
+            <br><button type="button" id="resetButton">Reset (X)</button>
+            <br><button type="button" id="changeStartNodeButton">Change Starting Node (Q)</button>
+            <br><button type="button" id="checkSolutionButton">Check Solution (Enter)</button> 
+        </div>
+
+        <br><br>
+        <button type="button" id="shareButton" onclick="copyBaseURL()">Share Wanderpath</button><br>
+        <button type="button" id="sharePuzzleButton" onclick="copySeedURL()">Share this puzzle</button>
+
     </div>
     
     <!-- Game div -->
-    <br>
     <div class="column" style="grid-area:col2">
+        <!-- Title -->
+        <h1 class="title"><b>~Wanderpath~</b></h1>
+        <p class="subtitle">
+            Welcome to a new kind of puzzle game!</p>
         <!-- Spot for the Phaser canvas -->
         <div id="game"></div>
         <div id="HtmlWinLabel" class="center-text"></div>   
     </div>
 
-    <!-- Controls -->
-    <div class="center-text" style="grid-area:col3">
-        <b>-- Controls --</b>
-        <br>WASD/Arrow Keys to move
-        <br><button type="button" id="undoButton">Undo (Z)</button>
-        <br><button type="button" id="resetButton">Reset (X)</button>
-        <br><button type="button" id="changeStartNodeButton">Change Starting Node (Q)</button>
-        <br><button type="button" id="checkSolutionButton">Check Solution (Enter)</button> 
-    </div>
-
-    <div class="column" style="grid-column-start: col1; grid-column-end: col3">
-        <!-- Descriptive text -->
+    <!-- Descriptive text -->
+    <div style="grid-area:col3; margin-right: 40px;">
+        <br><br>
         <p class="center-text">
-            Welcome to <b>Wanderpath</b>, a new kind of puzzle game!</p>
-        <p class="center-text">
-            <b>The Goal:</b><br>Start on one of the large circles and trace a path to the other circle<br>
+            <b>-- The Goal --</b>
+        </p>
+            Start on either large circle and trace a path to the other circle<br><br>
             If there is only one circle, trace a path back to the starting circle</p>
         <p class="center-text"> 
-            <b>The Rules:</b><br>The path can cross over itself (but can't reverse direction)<br>
-            A number on a line or intersection indicates that the path must pass over that line/intersection <i>exactly</i> the indicated number of times<br>
-            A blue arrow on a line indicates that the line must be passed over at least once, but only allows travel in the direction the arrow points<br>
-            Note: If arrows are present, it may be possible that there is only a solution from one of the two circles!</p>
+            <b>-- The Rules --</b>
+        </p>
+            The path can cross over itself (but can't reverse direction)<br><br>
+            A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times<br><br>
+            A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points<br><br>
+            Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!</p>
         <p class="center-text">
             Design and programming by <b>Cameron Dodd</b></p>
     </div>

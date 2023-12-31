@@ -8,11 +8,6 @@ class MainScene extends Phaser.Scene {
         graphics = this.add.graphics();
 
         initRNG();
-        seedButton.addEventListener('click', () => {
-            if (parseSeedString(seedTextArea.value)){
-                this.regenerateWholeScene();
-            }
-        });
 
         // define keys 
         UpKey    = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -28,9 +23,6 @@ class MainScene extends Phaser.Scene {
         XKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
         QKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         EnterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-
-        // show game title text
-        this.add.text(game.config.width / 2, 10, 'Wanderpath', textConfig).setOrigin(0.5, 0);
 
         //Hook up buttons that call scene functions
         document.querySelector('#regenerateGridButton').onclick = () => { this.initRandAndGenerate(); };
@@ -50,7 +42,6 @@ class MainScene extends Phaser.Scene {
             parseSeedString(seedString);
             urlSeed = true;
             this.puzzle.generatePuzzle(gridWidth, gridHeight);
-            setSeedText(seedString);
         } else {
             this.initRandAndGenerate()
         }
@@ -83,8 +74,8 @@ class MainScene extends Phaser.Scene {
     initRandAndGenerate(){
         initRNG();
         this.regenerateWholeScene(); 
-        setSeedText(createSeedString());
-        window.location.hash = seedTextArea.value;
+        let seedString = createSeedString();
+        window.location.hash = seedString;
     }
 
     //This function is called when the user clicks the Regenerate Game button on the left side of the page
@@ -100,6 +91,5 @@ class MainScene extends Phaser.Scene {
         game.scale.resize(newDim[0], newDim[1]);
         
         this.puzzle.resetAndRegenerate();
-        window.location.hash = seedTextArea.value;
     }
 }
