@@ -125,7 +125,7 @@ class PuzzleGrid {
 
         if(playerNode == endNode1 || playerNode == endNode2){
             if(this.allRestraintsSatisfied()){
-                winMessage.innerHTML = "Puzzle solved!";
+                winMessage.innerHTML = "<b>Puzzle solved!</b>";
             } else {
                 winMessage.innerHTML = "Some restraints aren't satisfied!";
             }

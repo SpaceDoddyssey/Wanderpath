@@ -162,7 +162,7 @@ class Edge extends GraphElement {
         }
         if(this.oneWayRestraint){
             let [ANodeLoc, BNodeLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
-            let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.85), percentBetween(ANodeLoc, BNodeLoc, 0.85)];
+            let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.80), percentBetween(ANodeLoc, BNodeLoc, 0.80)];
             graphics.lineStyle(3, 0x83BCFF, 1.0);
 
             let [CLoc, DLoc] = [[], []];
