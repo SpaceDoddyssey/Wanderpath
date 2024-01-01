@@ -67,9 +67,8 @@ class Node extends GraphElement {
     }
 
     ScreenLoc(){
-        // console.log("size per unit: ", sizePerUnit);
-        let x = borderPaddingLeftRight + (sizePerUnit * this.x) + sizePerUnit/2;
-        let y = borderPaddingTopBottom + (sizePerUnit * this.y) + sizePerUnit/2;
+        let x = borderPaddingLeft + (sizePerUnit * this.x) + sizePerUnit/2;
+        let y = borderPaddingTop + (sizePerUnit * this.y) + sizePerUnit/2;
         return [x, y]
     }
 

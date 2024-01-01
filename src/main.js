@@ -1,9 +1,8 @@
 // Note: This file is mostly used to store globals and utility functions
 // Go to index.html for webpage stuff and MainScene.js for puzzle stuff
 
-let borderPaddingLeftRight = 0;
-let borderPaddingTopBottom = 0;
-//Scale values in the default 500x500 grid
+let borderPaddingLeft = 0;
+let borderPaddingTop = 0;
 const baseSizePerUnit = 100; 
 const baseEdgeWidth = 20; 
 let sizePerUnit = baseSizePerUnit;
@@ -118,13 +117,13 @@ function adjustScale() {
     let height = baseSizePerUnit * gridHeight;
     let newScale = Math.min(defaultDimensions[0] / width, defaultDimensions[1] / height);
 
-    restraintConfig.fontSize = 28 * newScale;
+    restraintConfig.fontSize = 26 * newScale;
     sizePerUnit = baseSizePerUnit * newScale;
     edgeWidth = baseEdgeWidth * newScale;
 
     // Center the grid by adjusting the border padding
-    borderPaddingLeftRight = (defaultDimensions[0] - (width * newScale)) / 2;
-    borderPaddingTopBottom = (defaultDimensions[1] - (height * newScale)) / 2;
+    borderPaddingLeft = (defaultDimensions[0] - (width * newScale)) / 2;
+    borderPaddingTop = (defaultDimensions[1] - (height * newScale)) / 2;
 
 }
 
@@ -139,9 +138,10 @@ let config = {
 }
 
 let restraintConfig = {
-    fontFamily: 'Georgia',
+    fontFamily: 'Consolas',
     color: '#ff0404',
-    align: 'center'
+    align: 'center',
+    fontStyle: 'bold'
 }
 
 function getElementColor(timesCrossed){
