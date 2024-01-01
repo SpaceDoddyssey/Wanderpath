@@ -32,7 +32,7 @@ class Node extends GraphElement {
         if (this.numberRestraint != -1) {
             restraintTexts.push(scene.add.text(
                 this.ScreenLoc()[0], 
-                this.ScreenLoc()[1], 
+                this.ScreenLoc()[1] + 1, 
                 this.numberRestraint, 
                 restraintConfig
             ).setOrigin(0.5, 0.55));

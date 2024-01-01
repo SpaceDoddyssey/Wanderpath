@@ -22,8 +22,8 @@
                 div.classList.add("flex-row");
                 div.innerHTML = `<input type="number" id="${id}" name="${id}" class="param-field" required 
                                     onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
-                                    <label for="${labelFor}" class="param-label">
-                                ${labelText} (${minVal}-${maxVal})</label>`;
+                                 <label for="${labelFor}" class="param-label">
+                                    ${labelText} (${minVal}-${maxVal})</label>`;
                 document.getElementById("numFieldCol").appendChild(div);
             }
 
@@ -69,12 +69,17 @@
     <!-- Game div -->
     <div class="column" style="grid-area:col2">
         <!-- Title -->
-        <h1 class="title"><b>~Wanderpath~</b></h1>
-        <p class="subtitle">
-            Welcome to a new kind of puzzle game!</p>
+        <br>
+        <div class="title"><b>~Wanderpath~</b></div>
+        <div class="subtitle">
+            Welcome to a new kind of puzzle game!
+        </div>
+        <br>
         <!-- Spot for the Phaser canvas -->
         <div id="game"></div>
-        <div id="HtmlWinLabel" class="center-text"></div>   
+        <div style="text-align: center;">
+            <label id="HtmlWinLabel" class="winLabel"></label>
+        </div>
     </div>
 
     <!-- Descriptive text -->

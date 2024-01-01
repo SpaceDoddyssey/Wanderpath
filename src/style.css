@@ -33,8 +33,12 @@ body {
 }
 .subtitle {
     text-align: center;
+    font-family: 'Georgia';
     padding: -5px;
 }
 .credit {
     font-size: 12px;
+}
+.winLabel {
+    background-color: #00F6ED;
 }

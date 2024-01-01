@@ -120,14 +120,14 @@ class PuzzleGrid {
     checkWin(){
         let winMessage = document.querySelector("#HtmlWinLabel");
         if(playerNode != this.goalNode){
-            winMessage.innerHTML = "You're not at the goal node!";
+            winMessage.innerHTML = "&nbspYou're not at the goal node!&nbsp";
         }
 
         if(playerNode == endNode1 || playerNode == endNode2){
             if(this.allRestraintsSatisfied()){
-                winMessage.innerHTML = "<b>Puzzle solved!</b>";
+                winMessage.innerHTML = "<b>&nbspPuzzle solved!&nbsp</b>";
             } else {
-                winMessage.innerHTML = "Some restraints aren't satisfied!";
+                winMessage.innerHTML = "&nbspSome restraints aren't satisfied!&nbsp";
             }
         }
     }
@@ -166,6 +166,7 @@ class PuzzleGrid {
                         || (solutionsFromEN2 == 1 && solutionsFromEN1 < 2))
             if(!validPuzzle){
                 attempts += 1;
+                console.clear();
                 console.log("Failed to generate puzzle. Trying again. Attempts = " + attempts );
 
                 if(attempts > 500){
