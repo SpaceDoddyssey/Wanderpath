@@ -26,6 +26,8 @@ let gridHeight = heightField.value
 let maxLength  = lengthField.value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound
 let maxCrosses = maxCrossField.value //Max times a node or edge can be crossed
 
+let errorMessage = document.querySelector("#HtmlErrorLabel");
+
 let restraintTexts = [];
 let scene;
 let playerNode;
@@ -58,17 +60,25 @@ function parseSeedString(seedString) {
     console.log("Loading seed:", seedString);
     const seedStringRegex = /^\d+.\d+.\d+.\d+.\d+$/;
     if (!seedStringRegex.test(seedString)) {
-        let errorMessage = document.querySelector("#HtmlErrorLabel");
-        errorMessage.innerHTML = "<b>&nbspInvalid seed format!&nbsp"
-        throw new Error('Invalid seed format');
+        console.log("Invalid seed format!");
+        return false;
     }
     
     let seed;
+    console.log(seedString.split('.'));
     [widthField.value, heightField.value, lengthField.value, maxCrossField.value, seed]
         = seedString.split('.')
 
     rand.sow(seed.toString());
-    return(getCurParameters() != null);
+    let curParameters = getCurParameters();
+
+    if(curParameters == null) {
+        console.log("Invalid settings!");
+        return false;
+    } 
+
+    [gridWidth, gridHeight, maxLength, maxCrosses] = curParameters;
+    return true;
 }
 
 function getCurParameters(){
@@ -76,9 +86,8 @@ function getCurParameters(){
 
     //Check that the parameters are valid, display error message if necessary
     //The maximum path length is (width * height - 1) * maxCrossings
-    let errorMessage = document.querySelector("#HtmlErrorLabel");
-
     if(newML > (newGW * newGH - 1) * newMC){ 
+        console.log("Invalid settings!");
         errorMessage.innerHTML = "<b>&nbspInvalid settings!</b><br>&nbspPath Length must be at most&nbsp<br>&nbsp(Width * Height - 1) * Max Crosses&nbsp"
         return null;
     }
@@ -88,10 +97,12 @@ function getCurParameters(){
     let lengthNotInRange   = newML < lengthRange[0] || newML > lengthRange[1];
     let maxCrossNotInRange = newMC < maxCrossRange[0] || newMC > maxCrossRange[1];
     if(widthNotInRange || heightNotInRange || lengthNotInRange || maxCrossNotInRange){
+        console.log("Invalid settings!");
         errorMessage.innerHTML = "<b>&nbspInvalid settings!<br>Values out of range&nbsp"
         return null;
     }
 
+    console.log("Valid settings!");
     errorMessage.innerHTML = ""
     return [newGW, newGH, newML, newMC];
 }

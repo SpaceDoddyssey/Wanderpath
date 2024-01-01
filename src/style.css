@@ -13,14 +13,16 @@ body {
     flex-direction: column; 
     padding-top: 10px;
 }
+.param-field {
+    width:40px
+}
+.param-label {
+    margin-top: 2px;
+    background-color:#00F6ED;
+}
 .center-text {
     text-align: center;
 }
-.seed-text {
-    resize: none; 
-    width: 192px; 
-    height: 18px; 
-}   
 .title {
     font-size: 36px;
     font-weight: bold;
@@ -32,4 +34,7 @@ body {
 .subtitle {
     text-align: center;
     padding: -5px;
+}
+.credit {
+    font-size: 12px;
 }

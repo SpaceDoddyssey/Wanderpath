@@ -169,7 +169,7 @@ class PuzzleGrid {
                 console.log("Failed to generate puzzle. Trying again. Attempts = " + attempts );
 
                 if(attempts > 500){
-                    let errorMessage = document.querySelector("#HtmlErrorLabel");
+                    console.log("Failed to generate puzzle after 500 attempts. Giving up.")
                     errorMessage.innerHTML = "&nbspFailed to generate valid puzzle&nbsp"
                     return;
                 }

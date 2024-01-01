@@ -39,9 +39,20 @@ class MainScene extends Phaser.Scene {
         const seedString = document.location.hash.substring(1);
         if (seedString) {
             console.log("Loading seed from URL:", seedString)
-            parseSeedString(seedString);
-            urlSeed = true;
-            this.puzzle.generatePuzzle(gridWidth, gridHeight);
+            let validSeed = parseSeedString(seedString);
+            if(validSeed){
+                urlSeed = true;
+                this.regenerateWholeScene();
+            } else {
+                console.log("Invalid seed in URL, generating a new one")
+                widthField.value = 3;
+                heightField.value = 3;
+                lengthField.value = 12;
+                maxCrossField.value = 4;
+                [gridWidth, gridHeight, maxLength, maxCrosses] = [3, 3, 12, 4];
+                this.initRandAndGenerate();
+                errorMessage.innerHTML = "<b>&nbspInvalid seed loaded!</b><br>Generating with default settings"
+            }
         } else {
             this.initRandAndGenerate()
         }

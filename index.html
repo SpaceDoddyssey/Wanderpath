@@ -20,10 +20,10 @@
             function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
                 const div = document.createElement("div");
                 div.classList.add("flex-row");
-                div.innerHTML = `<input type="number" id="${id}" name="${id}" style="width:40px" required 
-                                onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
-                                <label for="${labelFor}" style="background-color:#00F6ED;">${labelText} (${minVal}-${maxVal})</label>
-                                <br>`;
+                div.innerHTML = `<input type="number" id="${id}" name="${id}" class="param-field" required 
+                                    onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
+                                    <label for="${labelFor}" class="param-label">
+                                ${labelText} (${minVal}-${maxVal})</label>`;
                 document.getElementById("numFieldCol").appendChild(div);
             }
 
@@ -55,12 +55,15 @@
             <br><button type="button" id="resetButton">Reset (X)</button>
             <br><button type="button" id="changeStartNodeButton">Change Starting Node (Q)</button>
             <br><button type="button" id="checkSolutionButton">Check Solution (Enter)</button> 
-        </div>
 
         <br><br>
+        <b>-- Share --</b>
+        <br><br>
+
         <button type="button" id="shareButton" onclick="copyBaseURL()">Share Wanderpath</button><br>
         <button type="button" id="sharePuzzleButton" onclick="copySeedURL()">Share this puzzle</button>
-
+        <span class="credit"><br>Design and programming by <b>Cameron Dodd</b></span>
+        </div>
     </div>
     
     <!-- Game div -->
@@ -80,7 +83,7 @@
         <p class="center-text">
             <b>-- The Goal --</b>
         </p>
-            Start on either large circle and trace a path to the other circle<br><br>
+            Start on either large circle and trace a path to the other circle.
             If there is only one circle, trace a path back to the starting circle</p>
         <p class="center-text"> 
             <b>-- The Rules --</b>
@@ -89,8 +92,6 @@
             A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times<br><br>
             A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points<br><br>
             Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!</p>
-        <p class="center-text">
-            Design and programming by <b>Cameron Dodd</b></p>
     </div>
 
     <!-- Imports -->
