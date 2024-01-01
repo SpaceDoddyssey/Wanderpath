@@ -1,10 +1,13 @@
 // Note: This file is mostly used to store globals and utility functions
 // Go to index.html for webpage stuff and MainScene.js for puzzle stuff
 
-let UIspacerheight = 128;
-let borderPadding = 0; //Set this to zero but keeping around in case I change my mind
-let sizePerUnit = 100;
-let edgeWidth = 20;
+let borderPaddingLeftRight = 0;
+let borderPaddingTopBottom = 0;
+//Scale values in the default 500x500 grid
+const baseSizePerUnit = 100; 
+const baseEdgeWidth = 20; 
+let sizePerUnit = baseSizePerUnit;
+let edgeWidth = baseEdgeWidth;
 
 let hasOneWayStreets = false; 
 let num_solutions = 0;
@@ -107,13 +110,23 @@ function getCurParameters(){
     return [newGW, newGH, newML, newMC];
 }
 
-let defaultDimensions = newDimensions(gridWidth, gridHeight)
+const defaultDimensions = [400, 400]
 
-function newDimensions(newGridWidth, newGridHeight) {
-    let w = (newGridWidth * sizePerUnit) + borderPadding * 2;
-    let h = (newGridHeight * sizePerUnit) + borderPadding * 2;
-    return [w, h];
-} 
+function adjustScale() {
+    //Adjust the scale of the grid based on the size of the game scene
+    let width = baseSizePerUnit * gridWidth;
+    let height = baseSizePerUnit * gridHeight;
+    let newScale = Math.min(defaultDimensions[0] / width, defaultDimensions[1] / height);
+
+    restraintConfig.fontSize = 28 * newScale;
+    sizePerUnit = baseSizePerUnit * newScale;
+    edgeWidth = baseEdgeWidth * newScale;
+
+    // Center the grid by adjusting the border padding
+    borderPaddingLeftRight = (defaultDimensions[0] - (width * newScale)) / 2;
+    borderPaddingTopBottom = (defaultDimensions[1] - (height * newScale)) / 2;
+
+}
 
 let config = {
     type: Phaser.CANVAS,
@@ -127,7 +140,6 @@ let config = {
 
 let restraintConfig = {
     fontFamily: 'Georgia',
-    fontSize: '28px',
     color: '#ff0404',
     align: 'center'
 }

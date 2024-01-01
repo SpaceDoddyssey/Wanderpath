@@ -97,10 +97,7 @@ class MainScene extends Phaser.Scene {
         [gridWidth, gridHeight, maxLength, maxCrosses] = newParams;
 
         // errorMessage.innerHTML = "<b>&nbspGenerating...&nbsp</b>"
-
-        let newDim = newDimensions(gridWidth, gridHeight);
-        game.scale.resize(newDim[0], newDim[1]);
-        
+        adjustScale();
         this.puzzle.resetAndRegenerate();
     }
 }
