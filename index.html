@@ -116,15 +116,16 @@
         <div class="center-text">
             <button id="cancelButton">Cancel</button>
             <span style="margin-left: 30px"></span>
-            <button id="saveButton">Save</button>
+            <button id="saveSettingsButton">Save</button>
         </div>
         <script>
             document.querySelector("#cancelButton").addEventListener("click", function() {
                 [widthField.value, heightField.value, lengthField.value, maxCrossingField.value] = oldParams;
                 document.querySelector("#settingsPopup").style.display = "none";
             });
-            document.querySelector("#saveButton").addEventListener("click", function() {
+            document.querySelector("#saveSettingsButton").addEventListener("click", function() {
                 document.querySelector("#settingsPopup").style.display = "none";
+                scene.regenerateWholeScene();
             });
 
             function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
