@@ -66,7 +66,7 @@ class PuzzleGrid {
 //###################################################################################################################
     
     movePlayer(direction){
-        document.querySelector("#HtmlWinLabel").innerHTML = "";
+        document.querySelector("#HtmlWinLabel").innerHTML = "<br>";
         let edge = playerNode.edges[direction];
 
         let lastDir = this.playerDirStack[this.playerDirStack.length - 1];
@@ -90,7 +90,7 @@ class PuzzleGrid {
     }
 
     undoMove(){
-        document.querySelector("#HtmlWinLabel").innerHTML = "";
+        document.querySelector("#HtmlWinLabel").innerHTML = "<br>";
         if(this.playerDirStack.length <= 1) return;
         let edge = playerNode.edges[InverseDirs[this.playerDirStack[this.playerDirStack.length - 1]]];
 
@@ -102,7 +102,7 @@ class PuzzleGrid {
     }
 
     resetPlayer(){
-        document.querySelector("#HtmlWinLabel").innerHTML = "";
+        document.querySelector("#HtmlWinLabel").innerHTML = "<br>";
         while(this.playerDirStack.length > 1){
             this.undoMove();
         }

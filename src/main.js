@@ -28,7 +28,9 @@ let gridHeight = heightField.value
 let maxLength  = lengthField.value //Note: A bit of a misnomer, this WILL be the path length, not an upper bound
 let maxCrosses = maxCrossField.value //Max times a node or edge can be crossed
 
-let errorMessage = document.querySelector("#HtmlErrorLabel");
+let oldParams;
+
+let errorMessage = document.querySelector("#errorLabel");
 
 let restraintTexts = [];
 let scene;
@@ -48,14 +50,17 @@ function createSeedString() {
 
 function copyBaseURL() {
     navigator.clipboard.writeText("https://spacedoddyssey.github.io/Wanderpath/");
-    document.querySelector("#shareButton").innerHTML = "Copied to clipboard!"
-    setTimeout(() => { document.querySelector("#shareButton").innerHTML = "Share Wanderpath" }, 1000);
+    let copyButton = document.querySelector("#copyToClipboardButton");
+    console.log("Found copy button:" + copyButton);
+    copyButton.innerHTML = "Copied!"
+    setTimeout(() => { copyButton.innerHTML = "Copy to Clipboard" }, 500);
 }
 
 function copySeedURL() {
     navigator.clipboard.writeText("https://spacedoddyssey.github.io/Wanderpath/#" + createSeedString());
-    document.querySelector("#sharePuzzleButton").innerHTML = "Copied to clipboard!"
-    setTimeout(() => { document.querySelector("#sharePuzzleButton").innerHTML = "Share this puzzle" }, 1000);
+    let copyButton = document.querySelector("#copyToClipboardButton");
+    copyButton.innerHTML = "Copied!"
+    setTimeout(() => { copyButton.innerHTML = "Copy to Clipboard" }, 500);
 }
 
 function parseSeedString(seedString) {
@@ -109,7 +114,8 @@ function getCurParameters(){
     return [newGW, newGH, newML, newMC];
 }
 
-const defaultDimensions = [400, 400]
+const squareSide = 390;
+const defaultDimensions = [squareSide, squareSide]
 
 function adjustScale() {
     //Adjust the scale of the grid based on the size of the game scene

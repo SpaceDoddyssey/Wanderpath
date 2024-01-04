@@ -4,27 +4,137 @@
     <title>Wanderpath</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/style.css" />
+    <link rel="stylesheet" href="src/style.css">
     <link rel="icon" type="image/jpg" href="assets/icon.jpg" sizes="96x96">
-    <a id="seedAnchor" href="/en-US/docs/Location.href#seed"></a>
 </head>
 
 <body>
     <!-- Game Settings and Controls -->
-    <div id="numFieldCol" class="column num-field-col" style="grid-area:col1">
-        <!-- First we create the parameter fields and associated labels -->
-        <br><br>
-        <div class="center-text"><b>-- Puzzle Settings --</b></div>
-        <br>
+    <div class="column center-text left-side-panel">
+        <div class="side-panel-subdiv">
+            <button type="button" id="infoButton">How to Play</button>
+            <button type="button" id="settingsButton">Settings</button>
+            <!-- Spot for a warning label if you entered invalid parameters -->
+            <label id="errorLabel"></label>
+            <div style="margin-top: 5em;"></div>
+            <button type="button" id="shareButton">Share Wanderpath</button>
+
+            <script>
+                document.querySelector("#infoButton").addEventListener("click", function() {
+                    document.querySelector("#instructionPopup").style.display = "block";
+                    document.querySelector("#settingsPopup").style.display = "none";
+                    document.querySelector("#sharePopup").style.display = "none";
+                });
+                document.querySelector("#settingsButton").addEventListener("click", function() {
+                    oldParams = getCurParameters();
+                    document.querySelector("#instructionPopup").style.display = "none";
+                    document.querySelector("#settingsPopup").style.display = "block";
+                    document.querySelector("#sharePopup").style.display = "none";
+                });
+                document.querySelector("#shareButton").addEventListener("click", function() {
+                    document.querySelector("#instructionPopup").style.display = "none";
+                    document.querySelector("#settingsPopup").style.display = "none";
+                    document.querySelector("#sharePopup").style.display = "block";
+                });
+            </script>
+        </div>
+    </div>
+    
+    <!-- Game div -->
+    <div class="column" style="grid-area:col2">
+        <div style="margin-top: 20px"></div>
+        <!-- Title -->
+        <div id="title"><b>~Wanderpath~</b></div>
+        <div id="subtitle">Welcome to a new kind of puzzle game!</div>
+        <div id="credit">Design and programming by <b>Cameron Dodd</b></div>
+        <div style="margin-top: 20px"></div>
+        <!-- Spot for the Phaser canvas -->
+        <div id="game"></div>
+        <div class="center-text">
+            <label id="HtmlWinLabel"><br></label>
+        </div>
+    </div>
+
+    <!-- Game Controls -->
+    <div class="column center-text right-side-panel">
+        <div class="side-panel-subdiv">
+            <button type="button" id="undoButton">Undo</button>
+            <button type="button" id="resetButton">Reset</button>
+            <button type="button" id="changeStartNodeButton">Change Starting Node</button>
+            <button type="button" id="checkSolutionButton">Check Solution</button> 
+            <button type="button" id="regenerateGridButton">Regenerate Game</button>
+        </div>
+    </div>
+
+
+<!-- POPUPS -->
+
+    <!-- How to Play-->
+    <div id="instructionPopup"  class="popup popup-instruction">
+        <button id="closeInfoButton">Close</button>
+        <div id="textDiv">
+            <p class="center-text">
+                <b>-- The Goal --</b>
+            </p>
+                Start on either large circle and trace a path to the other circle.
+                If there is only one circle, trace a path back to the starting circle.
+            <p class="center-text"> 
+                <b>-- The Rules --</b>
+            </p>
+                The path can cross over itself (but can't reverse direction).<br><br>
+                A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times.<br><br>
+                A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points.<br><br>
+                Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!
+            <p class="center-text">
+                <b>-- Keyboard Controls --</b>
+            </p>
+            <div class="row">
+                <!-- left column -->
+                <div style="float: left; width: 50%; text-align: center;">
+                    Move: WASD/Arrow Keys<br>
+                    Undo: Z<br>
+                    Reset: X<br>
+                </div>
+                <!-- right column -->
+                <div style="float: right; width: 50%; text-align: center;">
+                    Change Starting Node: Q<br>
+                    Check Solution: Enter<br>
+                    Regenerate Game: R<br>
+                </div>
+            </div>
+            <div style="margin-top: 20px"></div>
+        </div>
         <script>
+            document.querySelector("#closeInfoButton").addEventListener("click", function() {
+                this.parentElement.style.display = "none";
+            });
+        </script>
+    </div>
+
+    <!-- Settings -->
+    <div id="settingsPopup" class="popup popup-settings">
+        <div class="center-text">
+            <button id="cancelButton">Cancel</button>
+            <span style="margin-left: 30px"></span>
+            <button id="saveButton">Save</button>
+        </div>
+        <script>
+            document.querySelector("#cancelButton").addEventListener("click", function() {
+                [widthField.value, heightField.value, lengthField.value, maxCrossingField.value] = oldParams;
+                document.querySelector("#settingsPopup").style.display = "none";
+            });
+            document.querySelector("#saveButton").addEventListener("click", function() {
+                document.querySelector("#settingsPopup").style.display = "none";
+            });
+
             function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
                 const div = document.createElement("div");
                 div.classList.add("flex-row");
                 div.innerHTML = `<input type="number" id="${id}" name="${id}" class="param-field" required 
                                     onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
-                                 <label for="${labelFor}" class="param-label">
+                                    <label for="${labelFor}" class="param-label">
                                     ${labelText} (${minVal}-${maxVal})</label>`;
-                document.getElementById("numFieldCol").appendChild(div);
+                document.querySelector("#settingsPopup").appendChild(div);
             }
 
             const heightRange = [3, 8];
@@ -36,67 +146,38 @@
             createNumberFieldAndLabel("lengthField",      "lengthField",      "Path Length",        12, lengthRange[0],   lengthRange[1]);
             createNumberFieldAndLabel("maxCrossingField", "maxCrossingField", "Max Cross Capacity", 4,  maxCrossRange[0], maxCrossRange[1]);
         </script>
-
-        <!-- Button to regenerate the grid -->
-        <div class="center-text">
-        <button type="button" id="regenerateGridButton">Regenerate Game (R)</button>
-        </div>
-
-        <!-- Spot for a warning label if you entered invalid parameters -->
-        <label id="HtmlErrorLabel" style="background-color:#ff0404;"> </label>
-
-        <!-- Controls -->
-        <div class="center-text">
-            <br>
-            <b>-- Controls --</b>
-            <br>
-            <br>WASD/Arrow Keys to move
-            <br><button type="button" id="undoButton">Undo (Z)</button>
-            <br><button type="button" id="resetButton">Reset (X)</button>
-            <br><button type="button" id="changeStartNodeButton">Change Starting Node (Q)</button>
-            <br><button type="button" id="checkSolutionButton">Check Solution (Enter)</button> 
-
-        <br><br>
-        <b>-- Share --</b>
-        <br><br>
-
-        <button type="button" id="shareButton" onclick="copyBaseURL()">Share Wanderpath</button><br>
-        <button type="button" id="sharePuzzleButton" onclick="copySeedURL()">Share this puzzle</button>
-        <span class="credit"><br>Design and programming by <b>Cameron Dodd</b></span>
-        </div>
-    </div>
-    
-    <!-- Game div -->
-    <div class="column" style="grid-area:col2">
-        <!-- Title -->
-        <br>
-        <div class="title"><b>~Wanderpath~</b></div>
-        <div class="subtitle">
-            Welcome to a new kind of puzzle game!
-        </div>
-        <br>
-        <!-- Spot for the Phaser canvas -->
-        <div id="game"></div>
-        <div style="text-align: center;">
-            <label id="HtmlWinLabel" class="winLabel"></label>
-        </div>
     </div>
 
-    <!-- Descriptive text -->
-    <div style="grid-area:col3; margin-right: 40px;">
-        <br><br>
-        <p class="center-text">
-            <b>-- The Goal --</b>
-        </p>
-            Start on either large circle and trace a path to the other circle.
-            If there is only one circle, trace a path back to the starting circle</p>
-        <p class="center-text"> 
-            <b>-- The Rules --</b>
-        </p>
-            The path can cross over itself (but can't reverse direction)<br><br>
-            A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times<br><br>
-            A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points<br><br>
-            Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!</p>
+    <!-- Share -->
+    <div id="sharePopup" class="popup popup-share">
+        <div class="center-text">
+            <button id="closeShareButton">Close</button>
+            <div style="margin-top: 1em;"></div>
+            Wanderpath is a passion project by a single developer. <br>
+            Shares are much appreciated!
+
+            <div style="margin-top: 2em;"></div>
+            <button type="button" id="copyToClipboardButton">Copy To Clipboard</button>
+            <div style="margin-top: 1em;"></div>
+            <input type="radio" id="shareWanderpathRadio" name="shareOption" checked>
+                <label for="shareWanderpathRadio">Share Wanderpath</label>
+            <br>
+            <input type="radio" id="sharePuzzleRadio" name="shareOption">
+                <label for="sharePuzzleRadio">Share this puzzle</label>
+        </div>
+        <script>
+            document.querySelector("#closeShareButton").addEventListener("click", function() {
+                document.querySelector("#sharePopup").style.display = "none";
+            });
+
+            document.querySelector("#copyToClipboardButton").addEventListener("click", function() {
+                if (document.querySelector("#shareWanderpathRadio").checked) {
+                    copyBaseURL();
+                } else if (document.querySelector("#sharePuzzleRadio").checked) {
+                    copySeedURL();
+                }
+            });
+        </script>
     </div>
 
     <!-- Imports -->

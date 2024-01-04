@@ -4,41 +4,86 @@ body {
     background-color: #83BCFF;
     display: grid;
     grid-template:
-        "col1 col2 col3" 1fr
-        / 20vw 45vw 35vw;
-}
-.num-field-col {
-    position: absolute;
-    display: flex;
-    flex-direction: column; 
-    padding-top: 10px;
+        "col1 col2 col3" 100vh
+        / 30vw 40vw 30vw;
+    margin: 0px;
 }
 .param-field {
     width:40px
 }
 .param-label {
     margin-top: 2px;
-    background-color:#00F6ED;
+    font-weight: bold;
 }
 .center-text {
     text-align: center;
 }
-.title {
+div[id="title"] {
     font-size: 36px;
     font-weight: bold;
     text-align: center;
     color: rgba(73, 0, 118, 0.867);
     font-family: 'Georgia';
-    font: Georgia;
 }
-.subtitle {
+div[id="subtitle"] {
     text-align: center;
     font-family: 'Georgia';
-    padding: -5px;
 }
-.credit {
+div[id="credit"] {
     font-size: 12px;
+    text-align: center;
 }
-.winLabel {
+label[id="HtmlWinLabel"] {
     background-color: #00F6ED;
+}
+.popup {
+    display: none;  
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	background-color: #a483ff;
+	padding: 20px;
+	outline: 1px solid black;
+	border-radius: 10px;
+}
+.popup-instruction {
+    width: 75vw;
+    max-height: 75vh;
+    overflow-y: auto;
+	height: 75vh;
+}
+.popup-settings {
+    width: 500px;
+    height: 120px;
+}
+.popup-share {
+    width: 200px;
+    height: 280px;
+}
+label[id="errorLabel"] {
+    background-color:#ff0404;
+}
+.left-side-panel {
+    grid-area:col1; 
+    display:flex; 
+    flex-direction: row; 
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
+}
+.right-side-panel {
+    grid-area:col3; 
+    display:flex; 
+    flex-direction: row; 
+    align-items: center;
+    justify-content: center;
+    margin-top: 80px;
+}
+.side-panel-subdiv {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    gap: 1em;
 }
