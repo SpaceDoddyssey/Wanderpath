@@ -48,10 +48,6 @@ function createSeedString() {
     return `${gridWidth}.${gridHeight}.${maxLength}.${maxCrosses}.${curSeed}`;
 }
 
-// document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector("#saveSettingsButton").addEventListener("click", console.log.bind(console));
-// });
-
 function copyBaseURL() {
     navigator.clipboard.writeText("https://spacedoddyssey.github.io/Wanderpath/");
     let copyButton = document.querySelector("#copyToClipboardButton");

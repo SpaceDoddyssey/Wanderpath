@@ -20,22 +20,22 @@
             <button type="button" id="shareButton">Share Wanderpath</button>
 
             <script>
-                document.querySelector("#infoButton").addEventListener("click", function() {
+                document.querySelector("#infoButton").onclick = () => {
                     document.querySelector("#instructionPopup").style.display = "block";
                     document.querySelector("#settingsPopup").style.display = "none";
                     document.querySelector("#sharePopup").style.display = "none";
-                });
-                document.querySelector("#settingsButton").addEventListener("click", function() {
+                };
+                document.querySelector("#settingsButton").onclick = () => {
                     oldParams = getCurParameters();
                     document.querySelector("#instructionPopup").style.display = "none";
                     document.querySelector("#settingsPopup").style.display = "block";
                     document.querySelector("#sharePopup").style.display = "none";
-                });
-                document.querySelector("#shareButton").addEventListener("click", function() {
+                };
+                document.querySelector("#shareButton").onclick = () => {
                     document.querySelector("#instructionPopup").style.display = "none";
                     document.querySelector("#settingsPopup").style.display = "none";
                     document.querySelector("#sharePopup").style.display = "block";
-                });
+                };
             </script>
         </div>
     </div>
@@ -105,9 +105,9 @@
             <div style="margin-top: 20px"></div>
         </div>
         <script>
-            document.querySelector("#closeInfoButton").addEventListener("click", function() {
+            document.querySelector("#closeInfoButton").onclick = () => {
                 this.parentElement.style.display = "none";
-            });
+            };
         </script>
     </div>
 
@@ -119,14 +119,14 @@
             <button id="saveSettingsButton">Save</button>
         </div>
         <script>
-            document.querySelector("#cancelButton").addEventListener("click", function() {
+            document.querySelector("#cancelButton").onclick = () => {
                 document.querySelector("#settingsPopup").style.display = "none";
                 [widthField.value, heightField.value, lengthField.value, maxCrossingField.value] = oldParams;
-            });
-            document.querySelector("#saveSettingsButton").addEventListener("click", function() {
+            };
+            document.querySelector("#saveSettingsButton").onclick = () => {
                 document.querySelector("#settingsPopup").style.display = "none";
                 scene.regenerateWholeScene();
-            });
+            };
 
             function createNumberFieldAndLabel(id, labelFor, labelText, defaultValue, minVal, maxVal) {
                 const div = document.createElement("div");
@@ -177,17 +177,17 @@
                 <label for="sharePuzzleRadio">Share this puzzle</label>
         </div>
         <script>
-            document.querySelector("#closeShareButton").addEventListener("click", function() {
+            document.querySelector("#closeShareButton").onclick = () => {
                 document.querySelector("#sharePopup").style.display = "none";
-            });
+            };
 
-            document.querySelector("#copyToClipboardButton").addEventListener("click", function() {
+            document.querySelector("#copyToClipboardButton").onclick = () => {
                 if (document.querySelector("#shareWanderpathRadio").checked) {
                     copyBaseURL();
                 } else if (document.querySelector("#sharePuzzleRadio").checked) {
                     copySeedURL();
                 }
-            });
+            };
         </script>
     </div>
 
