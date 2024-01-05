@@ -202,11 +202,10 @@ function enforceMinMax(field){
         return;
     }
 
-    if(parseInt(field.value) < parseInt(field.min)){
-        field.value = field.min;
-    } else if(parseInt(field.value) > parseInt(field.max)){
-        field.value = field.max;
-    }
+    field.value = Math.max(
+        field.min, 
+        Math.min(field.max, field.value)
+    );
 }
 
 //Debug flags
