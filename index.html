@@ -120,8 +120,8 @@
         </div>
         <script>
             document.querySelector("#cancelButton").addEventListener("click", function() {
-                [widthField.value, heightField.value, lengthField.value, maxCrossingField.value] = oldParams;
                 document.querySelector("#settingsPopup").style.display = "none";
+                [widthField.value, heightField.value, lengthField.value, maxCrossingField.value] = oldParams;
             });
             document.querySelector("#saveSettingsButton").addEventListener("click", function() {
                 document.querySelector("#settingsPopup").style.display = "none";
@@ -142,14 +142,8 @@
                 `;
                 
                 const field = div.querySelector("#"+id);
-                div.querySelector("#leftArrow").addEventListener("click", function() {
-                    field.value = Math.max(minVal, field.value - 1); 
-                });
-                
-                div.querySelector("#rightArrow").addEventListener("click", function() {
-                    let newVal = parseInt(field.value) + 1
-                    field.value = Math.min(newVal, maxVal); 
-                });
+                div.querySelector("#leftArrow").onclick = () => { field.stepDown(); }
+                div.querySelector("#rightArrow").onclick = () => { field.stepUp(); }
 
                 document.querySelector("#settingsPopup").appendChild(div);
             }
