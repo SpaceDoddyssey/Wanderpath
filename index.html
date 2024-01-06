@@ -106,7 +106,7 @@
         </div>
         <script>
             document.querySelector("#closeInfoButton").onclick = () => {
-                this.parentElement.style.display = "none";
+                document.querySelector("#instructionPopup").style.display = "none";
             };
         </script>
     </div>
@@ -166,6 +166,10 @@
             <div style="margin-top: 1em;"></div>
             Wanderpath is a passion project by a single developer. <br>
             Shares are much appreciated!
+            <div style="margin-top: 1em;"></div>
+            <button type="button" id="discordButton"
+                onclick="window.open('https://discord.gg/3P8Zjy3Try', '_blank');"
+            >Join the Discord server</button>
 
             <div style="margin-top: 2em;"></div>
             <button type="button" id="copyToClipboardButton">Copy To Clipboard</button>

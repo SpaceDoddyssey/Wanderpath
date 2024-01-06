@@ -3,9 +3,15 @@ class MainScene extends Phaser.Scene {
         super("mainScene");
     }
 
+    preload() {
+        this.load.image('background', '../assets/Background.png');
+    }
+
     create() {
         scene = this;
         graphics = this.add.graphics();
+
+        // this.background = this.add.image(200, 200, 'background');
 
         initRNG();
 
