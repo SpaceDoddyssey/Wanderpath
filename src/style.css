@@ -17,11 +17,12 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 button {
+    font-family: Arial;
     background-color: #184c68;
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 3px;
+    padding: 4px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
@@ -29,6 +30,23 @@ button {
 button:hover {
     background-color: #175b80;
 }
+
+.discordButton {
+    font-family: Arial;
+    text-decoration: none;
+    background-color: #184c68;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.discordButton:hover {
+    background-color: #175b80;
+}
+
 .param-label {
     margin-top: 2px;
     width: 20em;
