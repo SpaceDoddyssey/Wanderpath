@@ -20,22 +20,19 @@
             <button type="button" id="shareButton">Share Wanderpath</button>
 
             <script>
-                document.querySelector("#infoButton").onclick = () => {
-                    document.querySelector("#instructionPopup").style.display = "block";
-                    document.querySelector("#settingsPopup").style.display = "none";
-                    document.querySelector("#sharePopup").style.display = "none";
-                };
+                function showPopup(popupId) {
+                    ["#instructionPopup", "#settingsPopup", "#sharePopup"].forEach(id => {
+                        document.querySelector(id).style.display = "none";
+                    });
+                    document.querySelector(popupId).style.display = "block";
+                }
+
+                document.querySelector("#infoButton").onclick = () => showPopup("#instructionPopup");
                 document.querySelector("#settingsButton").onclick = () => {
                     oldParams = getCurParameters();
-                    document.querySelector("#instructionPopup").style.display = "none";
-                    document.querySelector("#settingsPopup").style.display = "block";
-                    document.querySelector("#sharePopup").style.display = "none";
+                    showPopup("#settingsPopup");
                 };
-                document.querySelector("#shareButton").onclick = () => {
-                    document.querySelector("#instructionPopup").style.display = "none";
-                    document.querySelector("#settingsPopup").style.display = "none";
-                    document.querySelector("#sharePopup").style.display = "block";
-                };
+                document.querySelector("#shareButton").onclick = () => showPopup("#sharePopup");
             </script>
         </div>
     </div>
@@ -88,21 +85,15 @@
             <p class="center-text">
                 <b>-- Keyboard Controls --</b>
             </p>
-            <div class="row">
-                <!-- left column -->
-                <div style="float: left; width: 50%; text-align: center;">
-                    Move: WASD/Arrow Keys<br>
-                    Undo: Z<br>
-                    Reset: X<br>
-                </div>
-                <!-- right column -->
-                <div style="float: right; width: 50%; text-align: center;">
-                    Change Starting Node: Q<br>
-                    Check Solution: Enter<br>
-                    Regenerate Game: R<br>
-                </div>
+            <div class="controls-list">
+                <span>Move: WASD/Arrow Keys</span>
+                <span>Undo: Z</span>
+                <span>Reset: X</span>
+                <span>Change Starting Node: Q</span>
+                <span>Check Solution: Enter</span>
+                <span>Regenerate Game: R</span>
             </div>
-            <div style="margin-top: 20px"></div>
+            <div style="margin-top: 10px"></div>
         </div>
         <script>
             document.querySelector("#closeInfoButton").onclick = () => {

@@ -8,14 +8,27 @@ body {
         / 30vw 40vw 30vw;
     margin: 0px;
 }
+.center-text {
+    text-align: center;
+}
+
+/* Settings fields */
 .param-field {
     width:40px;
     appearance: textfield;
+}
+.param-label {
+    margin-top: 2px;
+    width: 20em;
+    display: inline-block;
+    font-weight: bold;
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+
+/* Buttons */
 button {
     font-family: Arial;
     background-color: #184c68;
@@ -47,15 +60,7 @@ button:hover {
     background-color: #175b80;
 }
 
-.param-label {
-    margin-top: 2px;
-    width: 20em;
-    display: inline-block;
-    font-weight: bold;
-}
-.center-text {
-    text-align: center;
-}
+/* Text */
 div[id="title"] {
     font-size: 36px;
     font-weight: bold;
@@ -74,6 +79,18 @@ div[id="credit"] {
 label[id="HtmlWinLabel"] {
     background-color: #00F6ED;
 }
+label[id="errorLabel"] {
+    background-color:#ff0404;
+}
+.controls-list {
+    display: grid; 
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-auto-flow: column;
+    place-items: center;
+}
+
+/* Pop-ups */
 .popup {
     display: none;  
 	position: absolute;
@@ -100,9 +117,8 @@ label[id="HtmlWinLabel"] {
     width: 300px;
     height: 260px;
 }
-label[id="errorLabel"] {
-    background-color:#ff0404;
-}
+
+/* Page Layout */
 .left-side-panel {
     grid-area:col1; 
     display:flex; 
