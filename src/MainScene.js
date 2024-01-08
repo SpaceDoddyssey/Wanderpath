@@ -30,6 +30,10 @@ class MainScene extends Phaser.Scene {
         document.querySelector('#resetButton').onclick = () => { this.puzzle.resetPlayer(); };
         document.querySelector('#changeStartNodeButton').onclick = () => { this.puzzle.changeStartNode(); };
         document.querySelector('#checkSolutionButton').onclick = () => { this.puzzle.checkWin(); };
+        document.querySelector('#upArrowButton').onclick = () => { this.puzzle.movePlayer(Dirs.Up); };
+        document.querySelector('#downArrowButton').onclick = () => { this.puzzle.movePlayer(Dirs.Down); };
+        document.querySelector('#leftArrowButton').onclick = () => { this.puzzle.movePlayer(Dirs.Left); };
+        document.querySelector('#rightArrowButton').onclick = () => { this.puzzle.movePlayer(Dirs.Right); };
 
         //Create a new empty puzzle grid
         this.puzzle = new PuzzleGrid(gridWidth, gridHeight);

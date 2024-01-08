@@ -160,7 +160,7 @@ div[id="desktop-spacer"] {
 @media (max-width: 600px) {
     body {
         grid-template:
-            "row1" 70vh
+            "row1" 79vh
             "row2" 7vh
             "row3" 7vh
             "row4" 7vh
