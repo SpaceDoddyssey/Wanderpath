@@ -10,41 +10,41 @@
 
 <body>
     <!-- Game Settings and Controls -->
-    <div class="column center-text left-side-panel">
-        <div class="side-panel-subdiv">
-            <button type="button" id="infoButton">How to Play</button>
-            <button type="button" id="settingsButton">Settings</button>
-            <!-- Spot for a warning label if you entered invalid parameters -->
-            <label id="errorLabel"></label>
-            <div style="margin-top: 5em;"></div>
-            <button type="button" id="shareButton">Share Wanderpath</button>
+    <div class="meta-button-panel">
+        <div class="mobile-side-spacer"></div>
+        <button type="button" id="infoButton">How to Play</button>
+        <button type="button" id="settingsButton">Settings</button>
+        <!-- Spot for a warning label if you entered invalid parameters -->
+        <label id="errorLabel"></label>
+        <div id="desktop-spacer"></div>
+        <button type="button" id="shareButton">Share Wanderpath</button>
+        <div class="mobile-side-spacer"></div>
 
-            <script>
-                function showPopup(popupId) {
-                    ["#instructionPopup", "#settingsPopup", "#sharePopup"].forEach(id => {
-                        document.querySelector(id).style.display = "none";
-                    });
-                    document.querySelector(popupId).style.display = "block";
-                }
+        <script>
+            function showPopup(popupId) {
+                ["#instructionPopup", "#settingsPopup", "#sharePopup"].forEach(id => {
+                    document.querySelector(id).style.display = "none";
+                });
+                document.querySelector(popupId).style.display = "block";
+            }
 
-                document.querySelector("#infoButton").onclick = () => showPopup("#instructionPopup");
-                document.querySelector("#settingsButton").onclick = () => {
-                    oldParams = getCurParameters();
-                    showPopup("#settingsPopup");
-                };
-                document.querySelector("#shareButton").onclick = () => showPopup("#sharePopup");
-            </script>
-        </div>
+            document.querySelector("#infoButton").onclick = () => showPopup("#instructionPopup");
+            document.querySelector("#settingsButton").onclick = () => {
+                oldParams = getCurParameters();
+                showPopup("#settingsPopup");
+            };
+            document.querySelector("#shareButton").onclick = () => showPopup("#sharePopup");
+        </script>
     </div>
     
     <!-- Game div -->
-    <div class="column" style="grid-area:col2">
+    <div class="game-div">
         <div style="margin-top: 20px"></div>
         <!-- Title -->
         <div id="title"><b>~Wanderpath~</b></div>
         <div id="subtitle">Welcome to a new kind of puzzle!</div>
         <div id="credit">A game by <b>Cameron Dodd</b></div>
-        <div style="margin-top: 20px"></div>
+        <div id="desktop-spacer"></div>
         <!-- Spot for the Phaser canvas -->
         <div id="game"></div>
         <div class="center-text">
@@ -53,16 +53,24 @@
     </div>
 
     <!-- Game Controls -->
-    <div class="column center-text right-side-panel">
-        <div class="side-panel-subdiv">
-            <button type="button" id="undoButton">Undo</button>
-            <button type="button" id="resetButton">Reset</button>
-            <button type="button" id="changeStartNodeButton">Change Starting Node</button>
-            <button type="button" id="checkSolutionButton">Check Solution</button> 
-            <button type="button" id="regenerateGridButton">Regenerate Game</button>
-        </div>
+    <div class="control-panel">
+        <div class="mobile-side-spacer"></div>
+        <button type="button" id="undoButton">Undo</button>
+        <button type="button" id="resetButton">Reset</button>
+        <button type="button" id="changeStartNodeButton">Change Starting Node</button>
+        <button type="button" id="checkSolutionButton">Check Solution</button> 
+        <button type="button" id="regenerateGridButton">Regenerate Game</button>
+        <div class="mobile-side-spacer"></div>
     </div>
 
+    <!-- Arrows - Only visible on mobile -->
+    <div class="arrow-panel">
+        <div class="mobile-side-spacer"></div>
+        <button type="button" id="upArrowButton" class="arrow-button">↑</button>
+        <button type="button" id="leftArrowButton" class="arrow-button">←</button>
+        <button type="button" id="rightArrowButton" class="arrow-button">→</button>
+        <button type="button" id="downArrowButton" class="arrow-button">↓</button>
+        <div class="mobile-side-spacer"></div>
 
 <!-- POPUPS -->
 
