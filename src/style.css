@@ -174,6 +174,16 @@ div[id="desktop-spacer"] {
         font-size: 12px;
         min-height: 40px;
     }
+    .discordButton {
+        padding: 3px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        font-size: 12px;
+        min-height: 40px;
+    }
+    div.popup button {
+        min-height: 26px;
+    }
     .game-div {
         grid-area: row1;
         margin-top: 0;
@@ -198,10 +208,6 @@ div[id="desktop-spacer"] {
         height: 140px;
         max-width: 80vw;
         overflow-y: auto;
-    }
-    .settings-popup-button {
-        display: inline-block;
-        min-height: 26px;
     }
     .meta-button-panel {
         grid-area: row4;

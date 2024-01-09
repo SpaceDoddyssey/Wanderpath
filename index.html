@@ -137,10 +137,10 @@
                 div.classList.add("flex-row");
                 div.innerHTML = `
                     <div>
-                        <button id="leftArrow" class="settings-popup-button">&lt</button>
+                        <button id="leftArrow">&lt</button>
                         <input type="number" id="${id}" name="${id}" class="param-field" required 
                             onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
-                        <button id="rightArrow" class="settings-popup-button">&gt</button>
+                        <button id="rightArrow">&gt</button>
                         <label for="${labelFor}" class="param-label">${labelText} (${minVal}-${maxVal})</label>
                     </div>
                 `;
