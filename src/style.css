@@ -163,16 +163,16 @@ div[id="desktop-spacer"] {
 @media (max-width: 600px) {
     body {
         grid-template:
-            "row1" 520px
+            "row1" 510px
             "row2" 7vh
             "row3" 7vh
             "row4" 7vh
             / 100vw;
     }
     button {
-        padding: 4px;
+        padding: 3px;
         font-size: 12px;
-        min-height: 50px;
+        min-height: 40px;
     }
     .game-div {
         grid-area: row1;
@@ -212,7 +212,7 @@ div[id="desktop-spacer"] {
     }
     div[id="desktop-spacer"] {
         margin: 0;
-        margin-top: 10px;
+        margin-top: 5px;
     }
     .mobile-side-spacer {
         margin-left: 0.1em;

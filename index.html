@@ -21,19 +21,23 @@
         <div class="mobile-side-spacer"></div>
 
         <script>
-            function showPopup(popupId) {
+            function togglePopup(popupId) {
+                let targetPopup = document.querySelector(popupId);
+                let wasVisible = targetPopup.style.display == "block";
                 ["#instructionPopup", "#settingsPopup", "#sharePopup"].forEach(id => {
                     document.querySelector(id).style.display = "none";
                 });
-                document.querySelector(popupId).style.display = "block";
+                if(!wasVisible){
+                    targetPopup.style.display = "block";
+                }
             }
 
-            document.querySelector("#infoButton").onclick = () => showPopup("#instructionPopup");
+            document.querySelector("#infoButton").onclick = () => togglePopup("#instructionPopup");
             document.querySelector("#settingsButton").onclick = () => {
                 oldParams = getCurParameters();
-                showPopup("#settingsPopup");
+                togglePopup("#settingsPopup");
             };
-            document.querySelector("#shareButton").onclick = () => showPopup("#sharePopup");
+            document.querySelector("#shareButton").onclick = () => togglePopup("#sharePopup");
         </script>
     </div>
     
