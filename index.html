@@ -17,7 +17,7 @@
         <!-- Spot for a warning label if you entered invalid parameters -->
         <label id="errorLabel"></label>
         <div id="desktop-spacer"></div>
-        <button type="button" id="shareButton">Share Wanderpath</button>
+        <button type="button" id="shareButton">Share</button>
         <div class="mobile-side-spacer"></div>
 
         <script>
@@ -39,7 +39,7 @@
     
     <!-- Game div -->
     <div class="game-div">
-        <div style="margin-top: 20px"></div>
+        <div id="desktop-spacer"></div>
         <!-- Title -->
         <div id="title"><b>~Wanderpath~</b></div>
         <div id="subtitle">Welcome to a new kind of puzzle!</div>
@@ -57,7 +57,7 @@
         <div class="mobile-side-spacer"></div>
         <button type="button" id="undoButton">Undo</button>
         <button type="button" id="resetButton">Reset</button>
-        <button type="button" id="changeStartNodeButton">Change Starting Node</button>
+        <button type="button" id="changeStartNodeButton">Change Start</button>
         <button type="button" id="checkSolutionButton">Check Solution</button> 
         <button type="button" id="regenerateGridButton">Regenerate Game</button>
         <div class="mobile-side-spacer"></div>
@@ -133,10 +133,10 @@
                 div.classList.add("flex-row");
                 div.innerHTML = `
                     <div>
-                        <button id="leftArrow">&lt</button>
+                        <button id="leftArrow" class="settings-popup-button">&lt</button>
                         <input type="number" id="${id}" name="${id}" class="param-field" required 
                             onchange="enforceMinMax(this)" min="${minVal}" max="${maxVal}" value="${defaultValue}">
-                        <button id="rightArrow">&gt</button>
+                        <button id="rightArrow" class="settings-popup-button">&gt</button>
                         <label for="${labelFor}" class="param-label">${labelText} (${minVal}-${maxVal})</label>
                     </div>
                 `;
