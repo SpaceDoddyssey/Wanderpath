@@ -98,6 +98,12 @@ label[id="errorLabel"] {
     grid-auto-flow: column;
     place-items: center;
 }
+div[id="how-to-play-top-row"]{
+    display: grid; 
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-auto-flow: column;
+    place-items: center;
+}
 
 /* Pop-ups */
 .popup {
@@ -113,10 +119,9 @@ label[id="errorLabel"] {
 	border-radius: 10px;
 }
 .popup-instruction {
-    width: 75vw;
-    max-height: 75vh;
-    overflow-y: auto;
+    width: 65vw;
 	height: 75vh;
+    padding-right: 0px;
 }
 .popup-settings {
     width: 500px;
@@ -160,7 +165,7 @@ div[id="desktop-spacer"] {
     margin-left: 0em;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 760px) {
     body {
         grid-template:
             "row1" 510px
@@ -185,6 +190,7 @@ div[id="desktop-spacer"] {
         min-height: 26px;
     }
     .game-div {
+        align-items: center;
         grid-area: row1;
         margin-top: 0;
     }

@@ -42,7 +42,7 @@
     </div>
     
     <!-- Game div -->
-    <div class="game-div">
+    <div class="game-div" id="game-div">
         <div id="desktop-spacer"></div>
         <!-- Title -->
         <div id="title"><b>~Wanderpath~</b></div>
@@ -81,32 +81,37 @@
 
     <!-- How to Play-->
     <div id="instructionPopup"  class="popup popup-instruction">
-        <button id="closeInfoButton">Close</button>
-        <div id="textDiv">
-            <p class="center-text">
-                <b>-- The Goal --</b>
-            </p>
-                Start on either large circle and trace a path to the other circle.
-                If there is only one circle, trace a path back to the starting circle.
-            <p class="center-text"> 
-                <b>-- The Rules --</b>
-            </p>
-                The path can cross over itself (but can't reverse direction).<br><br>
-                A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times.<br><br>
-                A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points.<br><br>
-                Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!
-            <p id="KeyboardControls" class="center-text">
-                <b>-- Keyboard Controls --</b>
-            </p>
-            <div class="controls-list">
-                <span>Move: WASD/Arrow Keys</span>
-                <span>Undo: Z</span>
-                <span>Reset: X</span>
-                <span>Change Starting Node: Q</span>
-                <span>Check Solution: Enter</span>
-                <span>Regenerate Game: R</span>
+        <div style="overflow-y: auto; max-height: 75vh">
+            <div id="how-to-play-top-row">
+                <button id="closeInfoButton">Close</button>
+                <span style="font-size: 32px"><b>-- How To Play --</b></span>
             </div>
-            <div style="margin-top: 10px"></div>
+            <div id="textDiv">
+                <p class="center-text">
+                    <b>-- The Goal --</b>
+                </p>
+                    Start on either large circle and trace a path to the other circle.
+                    If there is only one circle, trace a path back to the starting circle.
+                <p class="center-text"> 
+                    <b>-- The Rules --</b>
+                </p>
+                    The path can cross over itself (but can't reverse direction).<br><br>
+                    A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times.<br><br>
+                    A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points.<br><br>
+                    Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!
+                <p id="KeyboardControls" class="center-text">
+                    <b>-- Keyboard Controls --</b>
+                </p>
+                <div class="controls-list">
+                    <span>Move: WASD/Arrow Keys</span>
+                    <span>Undo: Z</span>
+                    <span>Reset: X</span>
+                    <span>Change Starting Node: Q</span>
+                    <span>Check Solution: Enter</span>
+                    <span>Regenerate Game: R</span>
+                </div>
+                <div style="margin-top: 10px"></div>
+            </div>
         </div>
         <script>
             document.querySelector("#closeInfoButton").onclick = () => {
