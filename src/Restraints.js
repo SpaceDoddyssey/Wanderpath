@@ -1,3 +1,15 @@
+let restraintConfig = {
+    fontFamily: 'Consolas',
+    color: '#ff0404',
+    align: 'center',
+    fontStyle: 'bold'
+}
+
+const restraintDict = {
+    "Number": "numberRestraint",
+    "OneWay": "oneWayRestraint"
+};
+
 class Restraint {
     constructor(element) {
         this.element = element;
@@ -10,7 +22,7 @@ class NumberRestraint extends Restraint {
         super(element);
         this.type = "Number";
         this.number = element.timesCrossed;
-        this.fontSize = restraintConfig.fontSize;
+        this.labelConfig = restraintConfig;
     }
 
     isSatisfied() {
@@ -18,10 +30,15 @@ class NumberRestraint extends Restraint {
     }
 
     drawRestraint(){
+        if(this.isSatisfied()){
+            this.labelConfig.color = '#04d104';
+        } else {
+            this.labelConfig.color = '#ff0404';
+        }
         restraintTexts.push(scene.add.text(
             this.element.ScreenLoc()[0], 
             this.element.ScreenLoc()[1] + 1, 
-            this.number, restraintConfig
+            this.number, this.labelConfig
         ).setOrigin(0.5, 0.55));
     }
 }
@@ -46,11 +63,18 @@ class OneWayRestraint extends Restraint {
     }
 
     drawRestraint(){
+        let color;
+        if(this.isSatisfied()){
+            color = 0x04d104;
+        } else {
+            color = 0xFF0404;
+        }
+
         const ANode = this.element.ANode;
         const BNode = this.element.BNode;
         let [ANodeLoc, BNodeLoc] = [ANode.ScreenLoc(), BNode.ScreenLoc()];
         let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.80), percentBetween(ANodeLoc, BNodeLoc, 0.80)];
-        graphics.lineStyle(3, 0x83BCFF, 1.0);
+        graphics.lineStyle(3, color, 1.0);
 
         let [CLoc, DLoc] = [[], []];
         let firstLoc, secondLoc;
