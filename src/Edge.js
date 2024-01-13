@@ -14,7 +14,7 @@ class Edge extends GraphElement {
 
     reset(){
         this.timesCrossed = 0;
-        this.numberRestraint = -1;
+        this.numberRestraint = null;
         this.totalRestraints = 0;
         this.canCrossAtoB = true;
         this.canCrossBtoA = true;
@@ -31,8 +31,8 @@ class Edge extends GraphElement {
     }
 
     addRestraints(){
-        if(this.numberRestraint == -1){
-            this.numberRestraint = this.timesCrossed;
+        if(this.numberRestraint == null){
+            this.numberRestraint = new NumberRestraint(this);
             this.totalRestraints++;
         }
 
@@ -45,7 +45,7 @@ class Edge extends GraphElement {
     tempRemoveRestraint(type){
         if (type == "Number"){
             this.storedRestraint = this.numberRestraint;
-            this.numberRestraint = -1;
+            this.numberRestraint = null;
         }
         else if (type == "OneWay"){
             this.storedAtoB = this.canCrossAtoB;
@@ -70,9 +70,10 @@ class Edge extends GraphElement {
     get oneWayRestraint() { return !(this.canCrossAtoB && this.canCrossBtoA); }
 
     restraintsSatisfied(){
-        if ((this.numberRestraint != -1) && (this.timesCrossed != this.numberRestraint)){
+        if(this.numberRestraint && !this.numberRestraint.isSatisfied()) {
             if (restraintDebug){ 
-                console.log("Edge " + this.ID + " number restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint) }
+                console.log("Edge " + this.ID + " number restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint.number) 
+            }
             return false;
         }
 
@@ -107,7 +108,7 @@ class Edge extends GraphElement {
 
     canCross(sourceNode){ //Can you cross this edge starting at the given node
         //If the edge is full up to numberRestraint, no
-        if (this.numberRestraint != -1 && this.timesCrossed == this.numberRestraint){
+        if (this.numberRestraint?.isSatisfied()){
             if(edgeCrossDebug) { console.log(this.id + " is full to restraint") }
             return false
         }
@@ -155,11 +156,11 @@ class Edge extends GraphElement {
     }
 
     drawRestraints(){
-        if(this.numberRestraint != -1){
+        if(this.numberRestraint != null){
             restraintTexts.push(scene.add.text(
                 this.ScreenLoc()[0], 
                 this.ScreenLoc()[1] + 1, 
-                this.numberRestraint, restraintConfig).setOrigin(0.5, 0.55));
+                this.numberRestraint.number, restraintConfig).setOrigin(0.5, 0.55));
         }
         if(this.oneWayRestraint){
             let [ANodeLoc, BNodeLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];

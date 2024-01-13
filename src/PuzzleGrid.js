@@ -163,12 +163,13 @@ class PuzzleGrid {
             if(hasOneWayStreets){
                 solutionsFromEN2 = this.checkSolutions(endNode2, endNode1);
             }
+
             //If there is exactly one solution from both end nodes or exactly one from one end node and 0 from the other
             validPuzzle = ((solutionsFromEN1 == 1 && solutionsFromEN2 < 2) 
                         || (solutionsFromEN2 == 1 && solutionsFromEN1 < 2))
             if(!validPuzzle){
                 attempts += 1;
-                console.clear();
+                // console.clear();
                 console.log("Failed to generate puzzle. Trying again. Attempts = " + attempts );
 
                 if(attempts > 500){
@@ -185,7 +186,8 @@ class PuzzleGrid {
         //First create a list of restraints
         this.restraintList = [];
         this.allElements.forEach(element => {
-            if(element.numberRestraint != -1){
+            // this.restraintList.push([...element.GetRestraints])
+            if(element.numberRestraint != null){
                 this.restraintList.push([element, "Number"]);
             }
             if(element.oneWayRestraint){
@@ -215,7 +217,7 @@ class PuzzleGrid {
     }
 
     allRestraintsSatisfied(){
-        // .some tests whether at least one restraint is not satisfied
+        // .some tests whether the case is true for at least one element in the array
         return !this.allElements.some(element => !element.restraintsSatisfied());
     }
 
@@ -277,15 +279,17 @@ class PuzzleGrid {
             }
         }
         //Past this point we know we are not already on a solution, so we need to keep looking
-
         //Note: Thought about aborting early if you reach maxLength, but I need to know if there are solutions that are longer than maxLength
 
-        if(node.numberRestraint != -1 && node.timesCrossed == node.numberRestraint){
+        //If the node can't be crossed any more times, 
+        //and there is more than 1 remaining crosses on edges with number restraints leading out of this node,
+        //we know that we've made a mistake somewhere and can abort early
+        if(node.numberRestraint?.isSatisfied()){
             let remainingOutboundCrosses = 0;
             for(let i = 0; i < 4; i++){
                 let e = node.edges[i];
-                if (e != null && e.numberRestraint != -1){ 
-                    remainingOutboundCrosses += e.numberRestraint - e.timesCrossed
+                if (e != null && e.numberRestraint != null){ 
+                    remainingOutboundCrosses += e.numberRestraint.number - e.timesCrossed
                 }
                 if(remainingOutboundCrosses > 1){
                     return;
@@ -404,101 +408,5 @@ class PuzzleGrid {
         this.allElements.forEach(element => {
             element.drawRestraints();
         });
-    }
-
-    //Prints the grid to console for debug purposes
-    //Written by Brian Dodd
-    printGrid(){
-        //let nodeArray = []
-        //let edgeArray = []
-        //this.nodes.forEach(node => { nodeArray.push(node.numberRestraint) })
-        //this.edges.forEach(edge => { edgeArray.push(edge.numberRestraint) })
-        //console.log(nodeArray)
-        //console.log(edgeArray)
-
-        this.edges.forEach(edge => {
-            if(restraintDebug && edge.oneWayRestraint){
-                let fromNode = edge.canCrossAtoB ? edge.ANode.ID : edge.BNode.ID;
-                let toNode = edge.canCrossAtoB ? edge.BNode.ID : edge.ANode.ID;
-                console.log("One way restraint on edge " + edge.ID + " from " + fromNode + " to " + toNode);
-            }
-        })
-
-        console.log("<Grid>")
-        for( var r=0; r<gridHeight; r++) {
-            let line = " ";
-            for( var c=0; c<gridWidth; c++) {
-                let id = (r*gridWidth) + c;
-                line += "[";
-                if ( id < 10) line += " ";
-                line = line + id + "]:";
-                let n = this.nodes[id];
-
-                if ( n.numberRestraint <  0) line += "##";
-                else {
-                    if ( n.numberRestraint < 10) line += " ";
-                            line += n.numberRestraint;
-                }
-
-                //if (n.edges[0]==null) line += "-"; else line += "e";  //U
-                //if (n.edges[1]==null) line += "-"; else line += "e";  //D
-                //if (n.edges[2]==null) line += "-"; else line += "e";  //L
-                //if (n.edges[3]==null) line += "-"; else line += "e";  //R
-
-                if (n.edges[3]==null) { //right edge
-                    line += "       ";
-                } else {
-                    let e = n.edges[3]; // right
-
-                    let ch0 = "{";
-                    let ch1 = "}";
-                    if (e.oneWayRestraint) {
-                        if (e.canCrossBtoA) ch0="<"; else ch0="(";
-                        if (e.canCrossAtoB) ch1=">"; else ch1=")";
-                    }       
-                    line += "  "+ch0;
-                    if ( e.ID < 10) line += " ";
-                    line = line + e.ID + ch1 + ":";
-                    if ( e.numberRestraint <  0) line += "##";
-                    else {
-                        if ( e.numberRestraint < 10) line += " ";
-                                line += e.numberRestraint;
-                    }
-                }
-                line += " ";
-            }
-            console.log( line );
-
-
-            line = " ";
-            for( let c=0; c<gridWidth; c++) {
-                let id = (r*gridWidth) + c;
-                let n = this.nodes[id];
-                    if (n.edges[1]==null) { //bottom edge
-                    line += "      ";
-                } else {
-                    let e = n.edges[1]; //bottom
-                    let ch0 = "{";
-                    let ch1 = "}";
-                    if (e.oneWayRestraint) {
-                        if (e.canCrossBtoA) ch0="<"; else ch0="(";
-                        if (e.canCrossAtoB) ch1=">"; else ch1=")";
-                    }       
-
-                    line += ch0;
-                    if ( e.ID < 10) line += " ";
-                    line = line + e.ID + ch1 + ":";
-
-                    if ( e.numberRestraint <  0) line += "##";
-                    else {
-                        if ( e.numberRestraint < 10) line += " ";
-                        line += e.numberRestraint;
-                    }
-                }
-                line += "          ";
-            }
-            console.log( line );
-        }
-        console.log(" ")
     }
 }

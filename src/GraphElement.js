@@ -3,14 +3,14 @@ class GraphElement {
         this.timesCrossed = 0;
         this.maxCrosses = maxCrosses;
 
-        this.numberRestraint = -1;
+        this.numberRestraint = null;
         this.totalRestraints = 0;
 
         this.ID = id;
     }
 
     restraintsSatisfied(){
-        if ((this.numberRestraint == -1) || (this.timesCrossed == this.numberRestraint)){
+        if ((this.numberRestraint == null) || (this.numberRestraint.isSatisfied())){
             return true
         } 
         if(restraintDebug) { 
@@ -33,7 +33,7 @@ class GraphElement {
     }
 
     canCross(){
-        if (this.numberRestraint != -1 && this.timesCrossed == this.numberRestraint){
+        if (this.numberRestraint?.isSatisfied()){
             return false
         }
 
