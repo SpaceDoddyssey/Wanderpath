@@ -187,19 +187,19 @@ class PuzzleGrid {
         this.restraintList = [];
         this.allElements.forEach(element => {
             // this.restraintList.push([...element.GetRestraints])
-            if(element.numberRestraint != null){
-                this.restraintList.push([element, "Number"]);
+            if(element.numberRestraint){
+                this.restraintList.push(element.numberRestraint);
             }
             if(element.oneWayRestraint){
                 hasOneWayStreets = true;
-                this.restraintList.push([element, "OneWay"]);
+                this.restraintList.push(element.oneWayRestraint);
             }
         })
 
         //Remove restraints that can be safely removed while maintaining uniqueness, in a random order
         rand.shuffle(this.restraintList);
         this.restraintList.forEach(restraint => {
-            this.tryRemoveRestraint(restraint[0], restraint[1]);    
+            this.tryRemoveRestraint(restraint);    
         })
         
         if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
@@ -288,7 +288,7 @@ class PuzzleGrid {
             let remainingOutboundCrosses = 0;
             for(let i = 0; i < 4; i++){
                 let e = node.edges[i];
-                if (e != null && e.numberRestraint != null){ 
+                if (e && e.numberRestraint){ 
                     remainingOutboundCrosses += e.numberRestraint.number - e.timesCrossed
                 }
                 if(remainingOutboundCrosses > 1){
@@ -337,7 +337,9 @@ class PuzzleGrid {
         return
     }
 
-    tryRemoveRestraint(element, typeToRemove){
+    tryRemoveRestraint(restraint){
+        let element = restraint.element;
+        let typeToRemove = restraint.type;
         if(restraintDebug) {
             console.log("xxxx " + element + typeToRemove);
             if(element.elementType == "Node"){
@@ -352,10 +354,7 @@ class PuzzleGrid {
         element.tempRemoveRestraint(typeToRemove);
         if (typeToRemove == "OneWay"){
             //Check if there are any one way streets remaining
-            hasOneWayStreets = false;
-            this.edges.forEach(edge => {
-                if(edge.oneWayRestraint) hasOneWayStreets = true; 
-            })
+            hasOneWayStreets = this.edges.some(edge => edge.oneWayRestraint);
         }
 
         //This logic is the same for all restraint types

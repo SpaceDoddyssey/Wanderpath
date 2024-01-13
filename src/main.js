@@ -187,6 +187,11 @@ const dirNames = ["north", "south", "west", "east"]
 
 let UpKey, DownKey, LeftKey, RightKey, RKey, ZKey, WKey, AKey, SKey, DKey, XKey, QKey, EnterKey;
 
+const restraintDict = {
+    "Number": "numberRestraint",
+    "OneWay": "oneWayRestraint"
+};
+
 let recursionCounter = 0;
 let recursionLimit = 30000;
 let recursionLimitReached = false;

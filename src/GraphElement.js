@@ -4,7 +4,6 @@ class GraphElement {
         this.maxCrosses = maxCrosses;
 
         this.numberRestraint = null;
-        this.totalRestraints = 0;
 
         this.ID = id;
     }

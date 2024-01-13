@@ -26,13 +26,8 @@ class Node extends GraphElement {
     }
 
     drawRestraints() {
-        if (this.numberRestraint != null) {
-            restraintTexts.push(scene.add.text(
-                this.ScreenLoc()[0], 
-                this.ScreenLoc()[1] + 1, 
-                this.numberRestraint.number, 
-                restraintConfig
-            ).setOrigin(0.5, 0.55));
+        if (this.numberRestraint) {
+            this.numberRestraint.drawRestraint();
         }
     }
 
@@ -44,11 +39,7 @@ class Node extends GraphElement {
     }
 
     addRestraints(){
-        if(this.numberRestraint == null){
-            this.numberRestraint = new NumberRestraint(this);
-            // this.numberRestraint = this.timesCrossed;
-            this.totalRestraints++;
-        }
+        this.numberRestraint = new NumberRestraint(this);
     }
 
     tempRemoveRestraint(type){ //type is unused here, but used in Edge

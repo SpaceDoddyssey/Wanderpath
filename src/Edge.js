@@ -13,7 +13,7 @@ class Edge extends GraphElement {
     reset(){
         this.timesCrossed = 0;
         this.numberRestraint = null;
-        this.totalRestraints = 0;
+        this.oneWayRestraint = null;
         this.numTimesCrossedAtoB = 0;
         this.numTimesCrossedBtoA = 0;
     }
@@ -28,16 +28,13 @@ class Edge extends GraphElement {
 
     addRestraints(){
         this.numberRestraint = new NumberRestraint(this);
-        this.totalRestraints++;
 
         let canCrossAtoB = this.numTimesCrossedAtoB != 0;
         let canCrossBtoA = this.numTimesCrossedBtoA != 0; 
         if(canCrossAtoB && !canCrossBtoA){
             this.oneWayRestraint = new OneWayRestraint(this, "AtoB");
-            this.totalRestraints++;
         } else if(!canCrossAtoB && canCrossBtoA){
             this.oneWayRestraint = new OneWayRestraint(this, "BtoA");
-            this.totalRestraints++;
         } else {
             this.oneWayRestraint = null;
             return;
@@ -55,30 +52,22 @@ class Edge extends GraphElement {
         }
     }
 
-    restoreRestraint(type){
-        if (type == "Number"){
-            this.numberRestraint = this.storedRestraint;
-        }
-        else if (type == "OneWay"){
-            this.oneWayRestraint = this.storedRestraint;
-            hasOneWayStreets = true;
+    tempRemoveRestraint(type) {
+        const restraint = restraintDict[type];
+        if (restraint) {
+            this.storedRestraint = this[restraint];
+            this[restraint] = null;
         }
     }
-
-    restraintsSatisfied(){
-        if(this.numberRestraint && !this.numberRestraint.isSatisfied()) {
-            if (restraintDebug){ 
-                console.log("Edge " + this.ID + " number restraint not satisfied, crossed ", this.timesCrossed, " times instead of ", this.numberRestraint.number) 
+    
+    restoreRestraint(type) {
+        const restraint = restraintDict[type];
+        if (restraint) {
+            this[restraint] = this.storedRestraint;
+            if (type === "OneWay") {
+                hasOneWayStreets = true;
             }
-            return false;
         }
-
-        if (this.oneWayRestraint?.isSatisfied() == false){
-            if(restraintDebug) { console.log("One way not satisfied on edge " + this.ID); }
-            return false;
-        }
-
-        return true;
     }
 
     cross(sourceNode) {
@@ -149,34 +138,11 @@ class Edge extends GraphElement {
     }
 
     drawRestraints(){
-        if(this.numberRestraint != null){
-            restraintTexts.push(scene.add.text(
-                this.ScreenLoc()[0], 
-                this.ScreenLoc()[1] + 1, 
-                this.numberRestraint.number, restraintConfig).setOrigin(0.5, 0.55));
+        if(this.numberRestraint){
+            this.numberRestraint.drawRestraint();
         }
         if(this.oneWayRestraint){
-            let [ANodeLoc, BNodeLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
-            let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.80), percentBetween(ANodeLoc, BNodeLoc, 0.80)];
-            graphics.lineStyle(3, 0x83BCFF, 1.0);
-
-            let [CLoc, DLoc] = [[], []];
-            let firstLoc, secondLoc;
-
-            let horizontalOrVertical = this.ANode.y == this.BNode.y ? 1 : 0;
-
-            [firstLoc, secondLoc] = (this.oneWayRestraint.direction == "AtoB") ? [ALoc, BLoc] : [BLoc, ALoc];
-            [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = (this.oneWayRestraint.direction == "AtoB") ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];
-            CLoc[horizontalOrVertical] -= edgeWidth / 5.1;
-            DLoc[horizontalOrVertical] += edgeWidth / 5.1;
-            
-            graphics.beginPath();
-            graphics.moveTo(...firstLoc);
-            graphics.lineTo(...secondLoc);
-            graphics.lineTo(...CLoc);
-            graphics.lineTo(...DLoc);
-            graphics.lineTo(...secondLoc);
-            graphics.stroke();
+            this.oneWayRestraint.drawRestraint();
         }
     }
 }
