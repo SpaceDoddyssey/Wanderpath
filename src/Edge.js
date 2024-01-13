@@ -6,8 +6,6 @@ class Edge extends GraphElement {
         
         this.elementType = "Edge"
 
-        this.canCrossAtoB = true;
-        this.canCrossBtoA = true;
         this.numTimesCrossedAtoB = 0;
         this.numTimesCrossedBtoA = 0;
     }
@@ -16,8 +14,6 @@ class Edge extends GraphElement {
         this.timesCrossed = 0;
         this.numberRestraint = null;
         this.totalRestraints = 0;
-        this.canCrossAtoB = true;
-        this.canCrossBtoA = true;
         this.numTimesCrossedAtoB = 0;
         this.numTimesCrossedBtoA = 0;
     }
@@ -31,15 +27,21 @@ class Edge extends GraphElement {
     }
 
     addRestraints(){
-        if(this.numberRestraint == null){
-            this.numberRestraint = new NumberRestraint(this);
-            this.totalRestraints++;
-        }
-
-        this.canCrossAtoB = !(this.numTimesCrossedAtoB == 0 && this.numTimesCrossedBtoA != 0);
-        this.canCrossBtoA = !(this.numTimesCrossedAtoB != 0 && this.numTimesCrossedBtoA == 0);
-        hasOneWayStreets = true;
+        this.numberRestraint = new NumberRestraint(this);
         this.totalRestraints++;
+
+        let canCrossAtoB = this.numTimesCrossedAtoB != 0;
+        let canCrossBtoA = this.numTimesCrossedBtoA != 0; 
+        if(canCrossAtoB && !canCrossBtoA){
+            this.oneWayRestraint = new OneWayRestraint(this, "AtoB");
+            this.totalRestraints++;
+        } else if(!canCrossAtoB && canCrossBtoA){
+            this.oneWayRestraint = new OneWayRestraint(this, "BtoA");
+            this.totalRestraints++;
+        } else {
+            this.oneWayRestraint = null;
+            return;
+        }
     }
 
     tempRemoveRestraint(type){
@@ -48,10 +50,8 @@ class Edge extends GraphElement {
             this.numberRestraint = null;
         }
         else if (type == "OneWay"){
-            this.storedAtoB = this.canCrossAtoB;
-            this.storedBtoA = this.canCrossBtoA;
-            this.canCrossAtoB = true;
-            this.canCrossBtoA = true;
+            this.storedRestraint = this.oneWayRestraint;
+            this.oneWayRestraint = null;
         }
     }
 
@@ -60,14 +60,10 @@ class Edge extends GraphElement {
             this.numberRestraint = this.storedRestraint;
         }
         else if (type == "OneWay"){
-            this.canCrossAtoB = this.storedAtoB;
-            this.canCrossBtoA = this.storedBtoA;
-
+            this.oneWayRestraint = this.storedRestraint;
             hasOneWayStreets = true;
         }
     }
-
-    get oneWayRestraint() { return !(this.canCrossAtoB && this.canCrossBtoA); }
 
     restraintsSatisfied(){
         if(this.numberRestraint && !this.numberRestraint.isSatisfied()) {
@@ -77,7 +73,7 @@ class Edge extends GraphElement {
             return false;
         }
 
-        if (this.oneWayRestraint && this.timesCrossed == 0){
+        if (this.oneWayRestraint?.isSatisfied() == false){
             if(restraintDebug) { console.log("One way not satisfied on edge " + this.ID); }
             return false;
         }
@@ -123,12 +119,9 @@ class Edge extends GraphElement {
             return false;
         }
         //If there's a one way restraint and we would be crossing it the wrong way, no
-        if(this.oneWayRestraint) {
-            if ((this.canCrossBtoA == false && sourceNode == this.BNode) || 
-            (this.canCrossAtoB == false && sourceNode == this.ANode)) {
-                if (edgeCrossDebug) { console.log("Can't cross one way restraint") }
-                return false;
-            }
+        if(this.oneWayRestraint?.canCross(sourceNode) == false){
+            if (edgeCrossDebug) { console.log("Can't cross one way restraint") }
+            return false;
         }
         //Otherwise yes
         if(edgeCrossDebug) { console.log("    edge:cancross: YES"); }
@@ -172,8 +165,8 @@ class Edge extends GraphElement {
 
             let horizontalOrVertical = this.ANode.y == this.BNode.y ? 1 : 0;
 
-            [firstLoc, secondLoc] = this.canCrossAtoB ? [ALoc, BLoc] : [BLoc, ALoc];
-            [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = this.canCrossAtoB ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];
+            [firstLoc, secondLoc] = (this.oneWayRestraint.direction == "AtoB") ? [ALoc, BLoc] : [BLoc, ALoc];
+            [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = (this.oneWayRestraint.direction == "AtoB") ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];
             CLoc[horizontalOrVertical] -= edgeWidth / 5.1;
             DLoc[horizontalOrVertical] += edgeWidth / 5.1;
             

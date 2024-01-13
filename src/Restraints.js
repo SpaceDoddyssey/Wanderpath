@@ -19,9 +19,18 @@ class NumberRestraint extends Restraint {
 }
 
 class OneWayRestraint extends Restraint {
-    constructor(element) {
+    constructor(element, direction) {
         super(element);
         this.type = "OneWay";
+        this.direction = direction;
+    }
+
+    canCross(sourceNode){
+        if (this.direction == "AtoB"){
+            return sourceNode == this.element.ANode;
+        } else if (this.direction == "BtoA"){
+            return sourceNode == this.element.BNode;
+        } 
     }
 
     isSatisfied() {
