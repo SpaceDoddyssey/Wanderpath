@@ -391,7 +391,10 @@ class PuzzleGrid {
 //##############################################################################################################
 
     drawGrid(){
-        graphics.clear();
+        for (const [name, layer] of Object.entries(graphicsLayers)) {
+            layer.clear();
+        };
+
         restraintTexts.forEach(text => {
             text.destroy()
         })

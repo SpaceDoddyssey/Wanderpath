@@ -5,7 +5,13 @@ class MainScene extends Phaser.Scene {
 
     create() {
         scene = this;
-        graphics = this.add.graphics();
+        graphicsLayers = { 
+            background: this.add.graphics(),
+            edges: this.add.graphics(),
+            nodes: this.add.graphics(),
+            restraints: this.add.graphics(),
+            player: this.add.graphics()
+        }
 
         initRNG();
 

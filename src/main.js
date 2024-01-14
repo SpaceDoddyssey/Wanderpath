@@ -210,5 +210,5 @@ let playerMoveDebug = false
 let playerMovementEnabled = true;
 
 //Create the game
-let graphics; 
+let graphicsLayers = {};  
 let game = new Phaser.Game(config);

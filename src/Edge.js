@@ -129,6 +129,7 @@ class Edge extends GraphElement {
 
         let color = getElementColor(this.timesCrossed);
 
+        let graphics = graphicsLayers.edges;
         graphics.lineStyle(edgeWidth, color, 1.0);
         
         graphics.beginPath();

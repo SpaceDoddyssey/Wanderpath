@@ -63,6 +63,7 @@ class OneWayRestraint extends Restraint {
     }
 
     drawRestraint(){
+        let graphics = graphicsLayers.restraints;
         let color;
         if(this.isSatisfied()){
             color = 0x04d104;
