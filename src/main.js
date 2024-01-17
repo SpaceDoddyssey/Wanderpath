@@ -7,6 +7,8 @@ const baseSizePerUnit = 100;
 const baseEdgeWidth = 20; 
 let sizePerUnit = baseSizePerUnit;
 let edgeWidth = baseEdgeWidth;
+const borderMultiplier = 1.9; 
+const innerBorderMultiplier = 1.1;
 
 let hasOneWayStreets = false; 
 let num_solutions = 0;
@@ -108,7 +110,6 @@ function getCurParameters(){
         return null;
     }
 
-    console.log("Valid settings!");
     errorMessage.innerHTML = ""
     return [newGW, newGH, newML, newMC];
 }
@@ -129,7 +130,6 @@ function adjustScale() {
     // Center the grid by adjusting the border padding
     borderPaddingLeft = (defaultDimensions[0] - (width * newScale)) / 2;
     borderPaddingTop = (defaultDimensions[1] - (height * newScale)) / 2;
-
 }
 
 let config = {

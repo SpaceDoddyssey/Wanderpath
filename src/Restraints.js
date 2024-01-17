@@ -28,19 +28,6 @@ class NumberRestraint extends Restraint {
     isSatisfied() {
         return (this.element.timesCrossed == this.number)    
     }
-
-    drawRestraint(){
-        if(this.isSatisfied()){
-            this.labelConfig.color = '#04d104';
-        } else {
-            this.labelConfig.color = '#ff0404';
-        }
-        restraintTexts.push(scene.add.text(
-            this.element.ScreenLoc()[0], 
-            this.element.ScreenLoc()[1] + 1, 
-            this.number, this.labelConfig
-        ).setOrigin(0.5, 0.55));
-    }
 }
 
 class OneWayRestraint extends Restraint {
@@ -63,7 +50,7 @@ class OneWayRestraint extends Restraint {
     }
 
     drawRestraint(){
-        let graphics = graphicsLayers.restraints;
+        let graphics = graphicsLayers.arrowRestraints;
         let color;
         if(this.isSatisfied()){
             color = 0x04d104;
@@ -74,25 +61,24 @@ class OneWayRestraint extends Restraint {
         const ANode = this.element.ANode;
         const BNode = this.element.BNode;
         let [ANodeLoc, BNodeLoc] = [ANode.ScreenLoc(), BNode.ScreenLoc()];
-        let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, 0.80), percentBetween(ANodeLoc, BNodeLoc, 0.80)];
+        let ALoc = percentBetween(BNodeLoc, ANodeLoc, 0.70)
+        let BLoc = percentBetween(ANodeLoc, BNodeLoc, 0.70);
         graphics.lineStyle(3, color, 1.0);
 
         let [CLoc, DLoc] = [[], []];
-        let firstLoc, secondLoc;
 
-        let horizontalOrVertical = ANode.y == BNode.y ? 1 : 0;
+        let horizontalOrVert = ANode.y == BNode.y ? 1 : 0;
 
-        [firstLoc, secondLoc] = (this.direction == "AtoB") ? [ALoc, BLoc] : [BLoc, ALoc];
-        [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = (this.direction == "AtoB") ? [ALoc[0], ALoc[1], ALoc[0], ALoc[1]] : [BLoc[0], BLoc[1], BLoc[0], BLoc[1]];
-        CLoc[horizontalOrVertical] -= edgeWidth / 5.1;
-        DLoc[horizontalOrVertical] += edgeWidth / 5.1;
+        let arrowTip = (this.direction == "AtoB") ? BLoc : ALoc;
+        [CLoc[0], CLoc[1], DLoc[0], DLoc[1]] = (this.direction == "AtoB") ? [...ALoc, ...ALoc] : [...BLoc, ...BLoc];
+        CLoc[horizontalOrVert] -= edgeWidth / 5.1;
+        DLoc[horizontalOrVert] += edgeWidth / 5.1;
         
         graphics.beginPath();
-        graphics.moveTo(...firstLoc);
-        graphics.lineTo(...secondLoc);
+        graphics.lineTo(...arrowTip);
         graphics.lineTo(...CLoc);
         graphics.lineTo(...DLoc);
-        graphics.lineTo(...secondLoc);
+        graphics.lineTo(...arrowTip);
         graphics.stroke();
     }
 }

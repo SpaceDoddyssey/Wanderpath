@@ -75,7 +75,7 @@ class PuzzleGrid {
             playerNode.uncross();
             this.playerDirStack.pop();
         } else {
-            if(edge == null || !edge.canCross(playerNode) || !edge.otherNode(playerNode).canCross()){
+            if(edge == null || edge.otherNode(playerNode).deadEnd || !edge.canCross(playerNode) || !edge.otherNode(playerNode).canCross()){
                 if (playerMoveDebug) console.log("Player can't move in that direction");
                 return false;
             }
@@ -203,6 +203,16 @@ class PuzzleGrid {
         })
         
         if (restraintDebug) console.log("----------------- \nAll Restraints removed. \n-----------------")
+
+        //Gotta do this twice, it doesn't catch everything the first time 
+        this.nodes.forEach(node => { node.checkDeadEnd(); });
+        this.nodes.forEach(node => { node.checkDeadEnd(); });
+
+        let connectedNodes = [];
+        endNode1.spreadConnectedness(connectedNodes);
+        let connectedWidth = Math.max(...connectedNodes.map(node => node.x)) - Math.min(...connectedNodes.map(node => node.x)) + 1
+        let connectedHeight = Math.max(...connectedNodes.map(node => node.y)) - Math.min(...connectedNodes.map(node => node.y)) + 1
+        console.log("Connected area is " + connectedWidth + " by " + connectedHeight);
 
         playerNode = endNode1;
         this.startNode = endNode1;
@@ -395,6 +405,9 @@ class PuzzleGrid {
             layer.clear();
         };
 
+        graphicsLayers.background.fillStyle(0x004f4f, 1.0);
+        graphicsLayers.background.fillRect(0, 0, 500, 500);
+
         restraintTexts.forEach(text => {
             text.destroy()
         })
@@ -406,9 +419,5 @@ class PuzzleGrid {
         if (playerMovementEnabled) { 
             playerNode.drawPlayer(this.playerDirStack[this.playerDirStack.length - 1]);
         }
-
-        this.allElements.forEach(element => {
-            element.drawRestraints();
-        });
     }
 }

@@ -7,33 +7,99 @@ class Node extends GraphElement {
         this.x = x, this.y = y;
 
         this.edges = [null, null, null, null];
+
+        this.deadEnd = false;
+        this.connected = false;
+    }
+
+    spreadConnectedness(connectedNodes){
+        this.connected = true;
+        connectedNodes.push(this);
+        this.edges.forEach(edge => {
+            let otherNode = edge?.otherNode(this);
+            if(edge && !edge.otherNode(this).connected && edge.numberRestraint?.number != false && !otherNode.deadEnd){
+                edge.otherNode(this).spreadConnectedness(connectedNodes);
+            }
+        });
+    }
+
+    checkDeadEnd() {
+        if (this.endPoint || this.deadEnd) {
+            return;
+        }
+
+        if(this.numberRestraint?.number == 0){
+            this.deadEnd = true;
+            return;
+        }
+
+        let numEdges = this.edges.filter(edge => 
+            edge && edge.numberRestraint?.number !== 0 && !edge.otherNode(this).deadEnd
+        ).length;
+        if (this.numberRestraint?.number === 0 || numEdges < 2) {
+            this.deadEnd = true;
+            this.edges.forEach(edge => edge?.otherNode(this).checkDeadEnd());
+        }
     }
 
     draw(){
+        if(this.deadEnd || !this.connected){
+            return;
+        }
         let color = getElementColor(this.timesCrossed);
 
         let loc = this.ScreenLoc();
         let graphics = graphicsLayers.nodes;
         if(this.endPoint){
-            graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], edgeWidth * 1.333)  
+            graphics.fillStyle(color, 1).fillCircle(loc[0], loc[1], edgeWidth);
         } else {
-            graphics.fillStyle(color, 1).fillRect(loc[0] - edgeWidth/2, loc[1] - edgeWidth/2, edgeWidth, edgeWidth)
+            let topleft = [loc[0] - edgeWidth/2, loc[1] - edgeWidth/2];
+            graphics.fillStyle(color, 1);
+            graphics.fillRect(...topleft, edgeWidth, edgeWidth);
+            graphics = graphicsLayers.elementBorders;
+            graphics.fillStyle(0x000000, 1);
+            topleft[0] -= edgeWidth * ((innerBorderMultiplier - 1) / 2);
+            topleft[1] -= edgeWidth * ((innerBorderMultiplier - 1) / 2);
+            let innerBorderSize = edgeWidth * innerBorderMultiplier;
+            graphics.fillRect(...topleft, innerBorderSize, innerBorderSize)
         }
+
+        this.drawRestraints();
     }
 
     drawPlayer(lastDir){
         let loc = this.ScreenLoc();
         let graphics = graphicsLayers.player;
-        graphics.fillStyle(0x0000FF, 1).fillCircle(loc[0], loc[1], edgeWidth / 1.3)
+        graphics.fillStyle(0x0000FF, 1).fillCircle(loc[0], loc[1], edgeWidth / 1.3);
     }
 
     drawRestraints() {
-        if (this.numberRestraint) {
-            this.numberRestraint.drawRestraint();
-        }
-    }
+        let graphics = graphicsLayers.numberRestraints;
+        let color, loc;
 
+        if (this.numberRestraint) {
+            if(this.numberRestraint.number == 0){
+                color = 0xDF1414;
+            } else {
+                color = getElementColor(this.numberRestraint.number);
+            }
+        } else {
+            color = 0x000000;
+        }
+
+        loc = this.ScreenLoc();
+
+        //Draw the restraint borders
+        let squareSize = edgeWidth * borderMultiplier;
+        let squareX = loc[0] - squareSize / 2;
+        let squareY = loc[1] - squareSize / 2;
+
+        graphics.fillStyle(color, 1.0);
+        graphics.fillRect(squareX, squareY, squareSize, squareSize);
+    }
+    
     reset(){
+        this.deadEnd = false;
         this.timesCrossed = 0;
         this.numberRestraint = null;
         this.totalRestraints = 0;

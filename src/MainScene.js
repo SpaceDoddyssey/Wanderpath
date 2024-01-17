@@ -7,9 +7,11 @@ class MainScene extends Phaser.Scene {
         scene = this;
         graphicsLayers = { 
             background: this.add.graphics(),
+            numberRestraints: this.add.graphics(),
+            elementBorders: this.add.graphics(),
             edges: this.add.graphics(),
             nodes: this.add.graphics(),
-            restraints: this.add.graphics(),
+            arrowRestraints: this.add.graphics(),
             player: this.add.graphics()
         }
 
@@ -66,6 +68,8 @@ class MainScene extends Phaser.Scene {
         } else {
             this.initRandAndGenerate()
         }
+
+        
 
         this.puzzle.drawGrid();
     }

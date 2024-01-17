@@ -124,7 +124,19 @@ class Edge extends GraphElement {
         return
     }
 
+    shouldBeDrawn(){
+        return this.numberRestraint?.number != 0 
+            && !this.ANode.deadEnd 
+            && !this.BNode.deadEnd 
+            && this.ANode.connected 
+            && this.BNode.connected;
+    }
+
     draw(){
+        //If you can't cross this edge at all, don't draw it
+        if(this.shouldBeDrawn() == false){
+            return;
+        }
         let [ALoc, BLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
 
         let color = getElementColor(this.timesCrossed);
@@ -136,13 +148,38 @@ class Edge extends GraphElement {
         graphics.moveTo(...ALoc);
         graphics.lineTo(...BLoc);
         graphics.stroke();
+
+        this.drawRestraints();
     }
 
-    drawRestraints(){
-        if(this.numberRestraint){
-            this.numberRestraint.drawRestraint();
+    drawBorder(graphics, color, ALoc, BLoc, width = borderMultiplier) {
+        graphics.lineStyle(edgeWidth * width, color, 1.0);
+        graphics.beginPath();
+        graphics.moveTo(...ALoc);
+        graphics.lineTo(...BLoc);
+        graphics.stroke();
+    }
+
+    drawRestraints() {
+        let graphics = graphicsLayers.numberRestraints;
+        let [ANodeLoc, BNodeLoc] = [this.ANode.ScreenLoc(), this.BNode.ScreenLoc()];
+        let [ALoc, BLoc] = [percentBetween(BNodeLoc, ANodeLoc, .9), percentBetween(ANodeLoc, BNodeLoc, .9)];
+
+        this.drawBorder(graphicsLayers.elementBorders, 0x000000, ALoc, BLoc, 1.1)
+        let color;
+        if (this.numberRestraint) {
+            if(this.numberRestraint.number == 0){
+                color = 0xDF1414;
+            } else {
+                color = getElementColor(this.numberRestraint.number);
+            }
+            this.drawBorder(graphics, color, ALoc, BLoc);
+        } else {
+            let color = 0x000000;
+            this.drawBorder(graphics, color, ALoc, BLoc);
         }
-        if(this.oneWayRestraint){
+
+        if (this.oneWayRestraint) {
             this.oneWayRestraint.drawRestraint();
         }
     }
