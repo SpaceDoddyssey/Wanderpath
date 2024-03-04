@@ -84,20 +84,22 @@
                 <p class="center-text">
                     <b>-- The Goal --</b>
                 </p>
-                    Start on either large circle and trace a path to the other circle.
+                    Trace a path from one circle to the other, following the rules below.
                     If there is only one circle, trace a path back to the starting circle.
                 <p class="center-text"> 
                     <b>-- The Rules --</b>
                 </p>
-                    The path can cross over itself (but can't reverse direction).<br><br>
-                    A number on a line or intersection indicates that you must pass over that line/intersection <i>exactly</i> that many times.<br><br>
-                    A blue arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points.<br><br>
+                    Use the movement keys to move the blue circle. You can move in any direction where there is a path, except the opposite direction of your previous move (But you can undo to go back).<br><br>
+                    As you move, a path will be drawn behind you. If the path crosses over itself, it will get darker in areas that have been covered more than once.<br><br>
+                    If a line or intersection has a colored border, you must pass over that line or intersection <i>exactly</i> enough times to make the path at that location the same color as the border. 
+                    You won't be able to pass through a space if it's already full!<br><br>
+                    An arrow on a line indicates that you must pass over it at least once, but you may only travel in the direction the arrow points.<br><br>
                     Hint: If arrows are present, it may be possible that there is only a solution from one of the two circles!
                 <p id="keyboard-controls" class="center-text">
                     <b>-- Keyboard Controls --</b>
                 </p>
                 <div id="controls-list">
-                    <span>Move: WASD/Arrow Keys</span>
+                    <span>Move: WASD or Arrow Keys</span>
                     <span>Undo: Z</span>
                     <span>Reset: X</span>
                     <span>Change Starting Node: Q</span>
